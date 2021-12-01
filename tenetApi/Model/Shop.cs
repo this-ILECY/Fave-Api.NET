@@ -1,11 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using tenet.Api.Model;
-using tenetApi.Model;
 
-namespace tenetModel.Model
+namespace tenetApi.Model
 {
-    public class Shop
+    public class Shop : ModelBase
     {
         [Key]
         public long ShopID { get; set; }
@@ -19,7 +17,6 @@ namespace tenetModel.Model
         public decimal ShopLatitude { get; set; }
         public decimal ShopLongitude { get; set; }
         public bool IsActive { get; set; }
-        public bool IsDelete { get; set; }
 
         public User userFk { get; set; }
         public List<Product> productFk { get; set; }

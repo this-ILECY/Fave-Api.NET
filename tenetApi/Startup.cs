@@ -16,8 +16,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using tenet.Api.Context;
-using tenet.Api.Model;
+using tenetApi.Context;
+using tenetApi.Model;
 
 namespace tenet.Api
 {

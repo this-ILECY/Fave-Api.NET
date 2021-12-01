@@ -1,10 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using tenet.Api.Model;
 
-namespace tenetModel.Model
+
+namespace tenetApi.Model
 {
-    public class Customer
+    public class Customer :ModelBase
     {
         [Key]
         public long CustomerID { get; set; }
@@ -17,7 +17,6 @@ namespace tenetModel.Model
         public int CellPhone { get; set; }
         [MaxLength(50)]
         public string Email { get; set; }
-        public bool IsDeleted{ get; set; }
 
         public List<CustomerAddress> custAdresFk {  get; set; }
         public User userFk { get; set; }

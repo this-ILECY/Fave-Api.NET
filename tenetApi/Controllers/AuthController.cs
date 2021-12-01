@@ -9,9 +9,9 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
-using tenet.Api.Model;
+using tenetApi.Model;
 
-namespace tenet.Api.Controllers
+namespace tenetApi.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]

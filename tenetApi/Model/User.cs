@@ -1,8 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using System;
-using tenetModel.Model;
 
-namespace tenet.Api.Model
+namespace tenetApi.Model
 {
     public class User: IdentityUser<long>
     {

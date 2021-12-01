@@ -1,10 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using tenetModel.Model;
 
 namespace tenetApi.Model
 {
-    public class ShopCategory
+    public class ShopCategory : ModelBase
     {
         [Key]
         public long ShopCategoryID { get; set; }
@@ -12,7 +11,6 @@ namespace tenetApi.Model
         public string ShopCategoryTitle { get; set; }
         [MaxLength(300)]
         public string ShopCategoryDescription { get; set; }
-        public bool IsDeleted { get; set; }
 
         public List<Shop> shopFk { get; set; }
     }

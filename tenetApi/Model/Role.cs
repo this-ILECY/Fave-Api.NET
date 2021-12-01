@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using System.Collections.Generic;
 
-namespace tenet.Api.Model
+namespace tenetApi.Model
 {
     public class Role :IdentityRole<long>
     {

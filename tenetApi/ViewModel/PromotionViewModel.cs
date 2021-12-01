@@ -1,12 +1,10 @@
 ﻿using System;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
+using tenetApi.Model;
 
-namespace tenetApi.Model
+namespace tenetApi.ViewModel
 {
-    public class Promotion : ModelBase
+    public class PromotionViewModel : ModelBase
     {
-        [Key]
         public long PromotionID { get; set; }
         public long ProductID { get; set; }
         public long ShopID { get; set; }
@@ -15,11 +13,7 @@ namespace tenetApi.Model
         public int Stock { get; set; }
         public int QualityGrade { get; set; }
         public DateTime EndDate { get; set; }
-        [MaxLength(30)]
         public string EndTime { get; set; }
-        public bool IsActive{ get; set; }
-
-        public Product productFk { get; set; }
-        public Shop shopFk { get; set; }
+        public bool IsActive { get; set; }
     }
 }

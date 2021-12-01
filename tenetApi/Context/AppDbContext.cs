@@ -1,10 +1,8 @@
 ﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using tenet.Api.Model;
 using tenetApi.Model;
-using tenetModel.Model;
 
-namespace tenet.Api.Context
+namespace tenetApi.Context
 {
     public class AppDbContext : IdentityDbContext<User,Role , long>
     {

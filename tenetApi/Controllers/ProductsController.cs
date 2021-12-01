@@ -2,10 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using tenet.Api.Context;
+using tenetApi.Context;
 using tenetApi.Model;
 using tenetApi.ViewModel;
 
@@ -42,9 +43,8 @@ namespace tenetApi.Controllers
                 return NotFound();
             }
 
-            //return Ok();
             return _productViewModel.ToList();
-            // return await _context.products.ToListAsync();
+
         }
 
         [HttpPost]
@@ -102,8 +102,8 @@ namespace tenetApi.Controllers
             return Ok();
             //return CreatedAtAction("GetProduct", new { id = product.ProductID }, product);
         }
-        
-        [HttpPut]
+
+        [HttpPost]
         [Route("ProductUpdate")]
         public async Task<IActionResult> UpdateProduct([FromBody] ProductViewModel product)
         {
@@ -133,8 +133,8 @@ namespace tenetApi.Controllers
 
             return Ok();
         }
-        
-        [HttpPut]
+
+        [HttpPost]
         [Route("ProductDelete")]
         public async Task<IActionResult> DeleteProduct([FromBody] long productId)
         {
@@ -153,7 +153,7 @@ namespace tenetApi.Controllers
             return Ok();
         }
 
-        [HttpPut]
+        [HttpPost]
         [Route("ProductDeleteUndo")]
         public async Task<IActionResult> UnDeleteProduct([FromBody] long productId)
         {

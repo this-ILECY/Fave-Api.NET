@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using tenet.Api.Context;
+using tenetApi.Context;
 
 namespace tenetApi.Migrations
 {
@@ -120,7 +120,194 @@ namespace tenetApi.Migrations
                     b.ToTable("AspNetUserTokens");
                 });
 
-            modelBuilder.Entity("tenet.Api.Model.Role", b =>
+            modelBuilder.Entity("tenetApi.Model.Customer", b =>
+                {
+                    b.Property<long>("CustomerID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<int>("CellPhone")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("CustomerFirstName")
+                        .HasMaxLength(30)
+                        .HasColumnType("nvarchar(30)");
+
+                    b.Property<string>("CustomerLastName")
+                        .HasMaxLength(30)
+                        .HasColumnType("nvarchar(30)");
+
+                    b.Property<string>("Email")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("Telephone")
+                        .HasColumnType("int");
+
+                    b.Property<long>("UserID")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("CustomerID");
+
+                    b.HasIndex("UserID")
+                        .IsUnique();
+
+                    b.ToTable("customers");
+                });
+
+            modelBuilder.Entity("tenetApi.Model.CustomerAddress", b =>
+                {
+                    b.Property<long>("CustomerAddressID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("AddressTitle")
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<long>("CustomerID")
+                        .HasColumnType("bigint");
+
+                    b.Property<decimal>("CustomerLatitude")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("CustomerLongitude")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.HasKey("CustomerAddressID");
+
+                    b.HasIndex("CustomerID");
+
+                    b.ToTable("customerAddresses");
+                });
+
+            modelBuilder.Entity("tenetApi.Model.Product", b =>
+                {
+                    b.Property<long>("ProductID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<long>("ProductCategoryID")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("ProductCode")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("ProductTitle")
+                        .HasMaxLength(30)
+                        .HasColumnType("nvarchar(30)");
+
+                    b.Property<long>("ShopID")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("description")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("ProductID");
+
+                    b.HasIndex("ProductCategoryID");
+
+                    b.HasIndex("ShopID");
+
+                    b.ToTable("products");
+                });
+
+            modelBuilder.Entity("tenetApi.Model.ProductCategory", b =>
+                {
+                    b.Property<long>("ProductCategoryID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("ProductCategoryDescription")
+                        .HasMaxLength(300)
+                        .HasColumnType("nvarchar(300)");
+
+                    b.Property<string>("ProductCategoryTitle")
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.HasKey("ProductCategoryID");
+
+                    b.ToTable("productCategories");
+                });
+
+            modelBuilder.Entity("tenetApi.Model.Promotion", b =>
+                {
+                    b.Property<long>("PromotionID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<long>("BasePrice")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<long>("DiscountPrice")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime>("EndDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("EndTime")
+                        .HasMaxLength(30)
+                        .HasColumnType("nvarchar(30)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<long>("ProductID")
+                        .HasColumnType("bigint");
+
+                    b.Property<int>("QualityGrade")
+                        .HasColumnType("int");
+
+                    b.Property<long>("ShopID")
+                        .HasColumnType("bigint");
+
+                    b.Property<int>("Stock")
+                        .HasColumnType("int");
+
+                    b.HasKey("PromotionID");
+
+                    b.HasIndex("ProductID");
+
+                    b.ToTable("promotion");
+                });
+
+            modelBuilder.Entity("tenetApi.Model.Role", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
@@ -149,7 +336,85 @@ namespace tenetApi.Migrations
                     b.ToTable("AspNetRoles");
                 });
 
-            modelBuilder.Entity("tenet.Api.Model.User", b =>
+            modelBuilder.Entity("tenetApi.Model.Shop", b =>
+                {
+                    b.Property<long>("ShopID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<int>("CellPhone")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("ShopAddress")
+                        .HasMaxLength(300)
+                        .HasColumnType("nvarchar(300)");
+
+                    b.Property<long?>("ShopCategoryID")
+                        .HasColumnType("bigint");
+
+                    b.Property<decimal>("ShopLatitude")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("ShopLongitude")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("ShopName")
+                        .HasMaxLength(30)
+                        .HasColumnType("nvarchar(30)");
+
+                    b.Property<int>("TelePhone")
+                        .HasColumnType("int");
+
+                    b.Property<long>("UserID")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("ShopID");
+
+                    b.HasIndex("ShopCategoryID");
+
+                    b.HasIndex("UserID")
+                        .IsUnique();
+
+                    b.ToTable("shops");
+                });
+
+            modelBuilder.Entity("tenetApi.Model.ShopCategory", b =>
+                {
+                    b.Property<long>("ShopCategoryID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("ShopCategoryDescription")
+                        .HasMaxLength(300)
+                        .HasColumnType("nvarchar(300)");
+
+                    b.Property<string>("ShopCategoryTitle")
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.HasKey("ShopCategoryID");
+
+                    b.ToTable("ShopCategory");
+                });
+
+            modelBuilder.Entity("tenetApi.Model.User", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
@@ -225,253 +490,9 @@ namespace tenetApi.Migrations
                     b.ToTable("AspNetUsers");
                 });
 
-            modelBuilder.Entity("tenetApi.Model.Product", b =>
-                {
-                    b.Property<long>("ProductID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<long>("ProductCategoryID")
-                        .HasColumnType("bigint");
-
-                    b.Property<long>("ProductCode")
-                        .HasColumnType("bigint");
-
-                    b.Property<string>("ProductTitle")
-                        .HasMaxLength(30)
-                        .HasColumnType("nvarchar(30)");
-
-                    b.Property<long>("ShopID")
-                        .HasColumnType("bigint");
-
-                    b.Property<string>("description")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("ProductID");
-
-                    b.HasIndex("ProductCategoryID");
-
-                    b.HasIndex("ShopID");
-
-                    b.ToTable("products");
-                });
-
-            modelBuilder.Entity("tenetApi.Model.ProductCategory", b =>
-                {
-                    b.Property<long>("ProductCategoryID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("ProductCategoryDescription")
-                        .HasMaxLength(300)
-                        .HasColumnType("nvarchar(300)");
-
-                    b.Property<string>("ProductCategoryTitle")
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
-
-                    b.HasKey("ProductCategoryID");
-
-                    b.ToTable("productCategories");
-                });
-
-            modelBuilder.Entity("tenetApi.Model.Promotion", b =>
-                {
-                    b.Property<long>("PromotionID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<long>("BasePrice")
-                        .HasColumnType("bigint");
-
-                    b.Property<long>("DiscountPrice")
-                        .HasColumnType("bigint");
-
-                    b.Property<DateTime>("EndDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("EndTime")
-                        .HasMaxLength(30)
-                        .HasColumnType("nvarchar(30)");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<long>("ProductID")
-                        .HasColumnType("bigint");
-
-                    b.Property<int>("QualityGrade")
-                        .HasColumnType("int");
-
-                    b.Property<long>("ShopID")
-                        .HasColumnType("bigint");
-
-                    b.Property<int>("Stock")
-                        .HasColumnType("int");
-
-                    b.HasKey("PromotionID");
-
-                    b.HasIndex("ProductID");
-
-                    b.ToTable("promotion");
-                });
-
-            modelBuilder.Entity("tenetApi.Model.ShopCategory", b =>
-                {
-                    b.Property<long>("ShopCategoryID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("ShopCategoryDescription")
-                        .HasMaxLength(300)
-                        .HasColumnType("nvarchar(300)");
-
-                    b.Property<string>("ShopCategoryTitle")
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
-
-                    b.HasKey("ShopCategoryID");
-
-                    b.ToTable("ShopCategory");
-                });
-
-            modelBuilder.Entity("tenetModel.Model.Customer", b =>
-                {
-                    b.Property<long>("CustomerID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<int>("CellPhone")
-                        .HasColumnType("int");
-
-                    b.Property<string>("CustomerFirstName")
-                        .HasMaxLength(30)
-                        .HasColumnType("nvarchar(30)");
-
-                    b.Property<string>("CustomerLastName")
-                        .HasMaxLength(30)
-                        .HasColumnType("nvarchar(30)");
-
-                    b.Property<string>("Email")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<int>("Telephone")
-                        .HasColumnType("int");
-
-                    b.Property<long>("UserID")
-                        .HasColumnType("bigint");
-
-                    b.HasKey("CustomerID");
-
-                    b.HasIndex("UserID")
-                        .IsUnique();
-
-                    b.ToTable("customers");
-                });
-
-            modelBuilder.Entity("tenetModel.Model.CustomerAddress", b =>
-                {
-                    b.Property<long>("CustomerAddressID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<string>("AddressTitle")
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
-
-                    b.Property<long>("CustomerID")
-                        .HasColumnType("bigint");
-
-                    b.Property<decimal>("CustomerLatitude")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<decimal>("CustomerLongitude")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.HasKey("CustomerAddressID");
-
-                    b.HasIndex("CustomerID");
-
-                    b.ToTable("customerAddresses");
-                });
-
-            modelBuilder.Entity("tenetModel.Model.Shop", b =>
-                {
-                    b.Property<long>("ShopID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<int>("CellPhone")
-                        .HasColumnType("int");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsDelete")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("ShopAddress")
-                        .HasMaxLength(300)
-                        .HasColumnType("nvarchar(300)");
-
-                    b.Property<long?>("ShopCategoryID")
-                        .HasColumnType("bigint");
-
-                    b.Property<decimal>("ShopLatitude")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<decimal>("ShopLongitude")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<string>("ShopName")
-                        .HasMaxLength(30)
-                        .HasColumnType("nvarchar(30)");
-
-                    b.Property<int>("TelePhone")
-                        .HasColumnType("int");
-
-                    b.Property<long>("UserID")
-                        .HasColumnType("bigint");
-
-                    b.HasKey("ShopID");
-
-                    b.HasIndex("ShopCategoryID");
-
-                    b.HasIndex("UserID")
-                        .IsUnique();
-
-                    b.ToTable("shops");
-                });
-
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<long>", b =>
                 {
-                    b.HasOne("tenet.Api.Model.Role", null)
+                    b.HasOne("tenetApi.Model.Role", null)
                         .WithMany()
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -480,7 +501,7 @@ namespace tenetApi.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<long>", b =>
                 {
-                    b.HasOne("tenet.Api.Model.User", null)
+                    b.HasOne("tenetApi.Model.User", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -489,7 +510,7 @@ namespace tenetApi.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<long>", b =>
                 {
-                    b.HasOne("tenet.Api.Model.User", null)
+                    b.HasOne("tenetApi.Model.User", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -498,13 +519,13 @@ namespace tenetApi.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<long>", b =>
                 {
-                    b.HasOne("tenet.Api.Model.Role", null)
+                    b.HasOne("tenetApi.Model.Role", null)
                         .WithMany()
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("tenet.Api.Model.User", null)
+                    b.HasOne("tenetApi.Model.User", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -513,11 +534,33 @@ namespace tenetApi.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<long>", b =>
                 {
-                    b.HasOne("tenet.Api.Model.User", null)
+                    b.HasOne("tenetApi.Model.User", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("tenetApi.Model.Customer", b =>
+                {
+                    b.HasOne("tenetApi.Model.User", "userFk")
+                        .WithOne("customerFk")
+                        .HasForeignKey("tenetApi.Model.Customer", "UserID")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("userFk");
+                });
+
+            modelBuilder.Entity("tenetApi.Model.CustomerAddress", b =>
+                {
+                    b.HasOne("tenetApi.Model.Customer", "customerFk")
+                        .WithMany("custAdresFk")
+                        .HasForeignKey("CustomerID")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("customerFk");
                 });
 
             modelBuilder.Entity("tenetApi.Model.Product", b =>
@@ -528,7 +571,7 @@ namespace tenetApi.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("tenetModel.Model.Shop", "shopFk")
+                    b.HasOne("tenetApi.Model.Shop", "shopFk")
                         .WithMany("productFk")
                         .HasForeignKey("ShopID")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -550,38 +593,16 @@ namespace tenetApi.Migrations
                     b.Navigation("productFk");
                 });
 
-            modelBuilder.Entity("tenetModel.Model.Customer", b =>
-                {
-                    b.HasOne("tenet.Api.Model.User", "userFk")
-                        .WithOne("customerFk")
-                        .HasForeignKey("tenetModel.Model.Customer", "UserID")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("userFk");
-                });
-
-            modelBuilder.Entity("tenetModel.Model.CustomerAddress", b =>
-                {
-                    b.HasOne("tenetModel.Model.Customer", "customerFk")
-                        .WithMany("custAdresFk")
-                        .HasForeignKey("CustomerID")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("customerFk");
-                });
-
-            modelBuilder.Entity("tenetModel.Model.Shop", b =>
+            modelBuilder.Entity("tenetApi.Model.Shop", b =>
                 {
                     b.HasOne("tenetApi.Model.ShopCategory", "shopCategoryFk")
                         .WithMany("shopFk")
                         .HasForeignKey("ShopCategoryID")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("tenet.Api.Model.User", "userFk")
+                    b.HasOne("tenetApi.Model.User", "userFk")
                         .WithOne("shopFk")
-                        .HasForeignKey("tenetModel.Model.Shop", "UserID")
+                        .HasForeignKey("tenetApi.Model.Shop", "UserID")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
@@ -590,11 +611,9 @@ namespace tenetApi.Migrations
                     b.Navigation("userFk");
                 });
 
-            modelBuilder.Entity("tenet.Api.Model.User", b =>
+            modelBuilder.Entity("tenetApi.Model.Customer", b =>
                 {
-                    b.Navigation("customerFk");
-
-                    b.Navigation("shopFk");
+                    b.Navigation("custAdresFk");
                 });
 
             modelBuilder.Entity("tenetApi.Model.Product", b =>
@@ -607,19 +626,21 @@ namespace tenetApi.Migrations
                     b.Navigation("productFk");
                 });
 
+            modelBuilder.Entity("tenetApi.Model.Shop", b =>
+                {
+                    b.Navigation("productFk");
+                });
+
             modelBuilder.Entity("tenetApi.Model.ShopCategory", b =>
                 {
                     b.Navigation("shopFk");
                 });
 
-            modelBuilder.Entity("tenetModel.Model.Customer", b =>
+            modelBuilder.Entity("tenetApi.Model.User", b =>
                 {
-                    b.Navigation("custAdresFk");
-                });
+                    b.Navigation("customerFk");
 
-            modelBuilder.Entity("tenetModel.Model.Shop", b =>
-                {
-                    b.Navigation("productFk");
+                    b.Navigation("shopFk");
                 });
 #pragma warning restore 612, 618
         }

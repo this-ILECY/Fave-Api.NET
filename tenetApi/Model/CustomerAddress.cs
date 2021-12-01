@@ -1,8 +1,8 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace tenetModel.Model
+namespace tenetApi.Model
 {
-    public class CustomerAddress
+    public class CustomerAddress:ModelBase
     {
         [Key]
         public long CustomerAddressID { get; set; }
@@ -11,7 +11,7 @@ namespace tenetModel.Model
         public string AddressTitle { get; set; }
         public decimal CustomerLatitude { get; set; }
         public decimal CustomerLongitude { get; set; }
-        public bool IsDeleted{ get; set; }
+
 
         public Customer customerFk {  get; set; }
 

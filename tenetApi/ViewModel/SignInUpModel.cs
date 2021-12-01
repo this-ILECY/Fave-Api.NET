@@ -1,4 +1,4 @@
-﻿namespace tenet.Api.Model
+﻿namespace tenetApi.Model
 {
     public class SignInUpModel
     {
