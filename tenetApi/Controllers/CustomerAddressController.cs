@@ -19,13 +19,14 @@ namespace tenetApi.Controllers
         {
             _context = context;
         }
+        // list of each customer addresses
         [HttpPost]
-        [Route("AddressByCustomerID")]
+        [Route("AddressByCustomerID")] 
         public async Task<ActionResult<IEnumerable<CustomerAddressViewModel>>> GetAddressByCustomerID([FromBody] long CustomerID)
         {
             _customerAddressViewModel = _context.customerAddresses.Select(c => new CustomerAddressViewModel()
             {
-                AddressTitle = c.AddressTitle,
+                AddressTitle = c.AddressTitle.Replace("_", " "),//change form (ex: "my_new_address" to "my new address")
                 CustomerAddressID = c.CustomerAddressID,
                 CustomerID = c.CustomerID,
                 CustomerLatitude = c.CustomerLatitude,
@@ -38,15 +39,16 @@ namespace tenetApi.Controllers
             {
                 return NotFound();
             }
-
+            
             return _customerAddressViewModel.ToList();
         }
+        //create a new address for customer
         [HttpPost]
-        [Route("AddCustomerAddress")]
-        public async Task<ActionResult> AddCustomer([FromBody] CustomerAddressViewModel customerAddress)
+        [Route("CustomerAddressAdd")]
+        public async Task<ActionResult> AddCustomerAddress([FromBody] CustomerAddressViewModel customerAddress)
         {
-            customerAddress.AddressTitle = customerAddress.AddressTitle.ToLower();
-            if (customerAddress.AddressTitle.Contains(" "))
+            customerAddress.AddressTitle = customerAddress.AddressTitle.ToLower();//for better search, all characters Lowercase!
+            if (customerAddress.AddressTitle.Contains(" "))//change space to underline
             {
                 customerAddress.AddressTitle = customerAddress.AddressTitle.Replace(" ", "_");
             }
@@ -71,17 +73,18 @@ namespace tenetApi.Controllers
 
             return Ok();
         }
+        //make changes in addresses
         [HttpPost]
-        [Route("UpdateCustomerAddress")]
+        [Route("CustomerAddressUpdate")]
         public async Task<ActionResult<CustomerViewModel>> UpdateCustomer([FromBody] CustomerAddressViewModel customerAddress)
         {
             var custId = _context.customerAddresses.FirstOrDefault(c => c.CustomerAddressID == customerAddress.CustomerAddressID);
 
             if (custId == null)
             {
-                return BadRequest();
+                return BadRequest("Customer not found!");
             }
-            if (customerAddress.AddressTitle.Contains(" "))
+            if (customerAddress.AddressTitle.Contains(" "))//change space to underline
             {
                 customerAddress.AddressTitle = customerAddress.AddressTitle.Replace(" ", "_");
             }
@@ -95,7 +98,7 @@ namespace tenetApi.Controllers
             return Ok();
         }
         [HttpPost]
-        [Route("DeleteCustomerAddress")]
+        [Route("CustomerAddressDelete")]
         public async Task<ActionResult<CustomerViewModel>> DeleteCustomer([FromBody] long customerAddressID)
         {
 
@@ -107,7 +110,7 @@ namespace tenetApi.Controllers
             return Ok();
         }
         [HttpPost]
-        [Route("UndoDeleteCustomerAddress")]
+        [Route("CustomerAddressUndoDelete")]
         public async Task<ActionResult<CustomerViewModel>> UndoDeleteCustomer([FromBody] long customerAddressID)
         {
 

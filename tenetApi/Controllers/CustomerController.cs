@@ -26,9 +26,9 @@ namespace tenetApi.Controllers
             _customerViewModel = _context.customers.Select(c => new CustomerViewModel()
             {
                 CellPhone = c.CellPhone,
-                CustomerFirstName = c.CustomerFirstName,
+                CustomerFirstName = c.CustomerFirstName.Replace("_"," "),
                 CustomerID = c.CustomerID,
-                CustomerLastName = c.CustomerLastName,
+                CustomerLastName = c.CustomerLastName.Replace("_", " "),
                 Email = c.Email,
                 Telephone = c.Telephone,
                 UserID = c.UserID
@@ -55,7 +55,7 @@ namespace tenetApi.Controllers
                 Email = c.Email,
                 Telephone = c.Telephone,
                 UserID = c.UserID
-            }).ToList().Where(c => (c.CustomerFirstName + " " + c.CustomerLastName).Contains(CustomerName));
+            }).ToList().Where(c => (c.CustomerFirstName + " " + c.CustomerLastName).Contains(CustomerName.ToLower()));//search through firstname and lastname together!
 
             if (_customerViewModel == null)
             {
@@ -76,7 +76,7 @@ namespace tenetApi.Controllers
                 Email = c.Email,
                 Telephone = c.Telephone,
                 UserID = c.UserID
-            }).ToList().Where(c => c.Email.Contains(CustomerEmail));
+            }).ToList().Where(c => c.Email.Contains(CustomerEmail.ToLower()));
 
             if (_customerViewModel == null)
             {
@@ -88,7 +88,7 @@ namespace tenetApi.Controllers
         [Route("CustomerByTelephone")]
         public async Task<ActionResult<IEnumerable<CustomerViewModel>>> GetCustomerByTelephone([FromBody] string CustomerTelephone)
         {
-            if (CustomerTelephone.StartsWith("0"))
+            if (CustomerTelephone.StartsWith("0"))//telephone is "long" and does
             {
                 CustomerTelephone = CustomerTelephone.Remove(0, 1);
             }
@@ -135,7 +135,7 @@ namespace tenetApi.Controllers
             return _customerViewModel.ToList();
         }
         [HttpPost]
-        [Route("AddCustomer")]
+        [Route("CustomerAdd")]
         public async Task<ActionResult<CustomerViewModel>> AddCustomer([FromBody] CustomerViewModel customer)
         {
             if (customer.CustomerFirstName.Contains(" ") || customer.CustomerLastName.Contains(" "))
@@ -151,13 +151,12 @@ namespace tenetApi.Controllers
 
             if (userId == null)
             {
-                return BadRequest();
+                return BadRequest("Invalid user!");
             }
 
             Customer theCustomer = new Customer();
             theCustomer.CellPhone = customer.CellPhone;
             theCustomer.CustomerFirstName = customer.CustomerFirstName;
-            theCustomer.CustomerID = customer.CustomerID;
             theCustomer.CustomerLastName = customer.CustomerLastName;
             theCustomer.Email = customer.Email;
             theCustomer.Telephone = customer.Telephone;
@@ -197,14 +196,14 @@ namespace tenetApi.Controllers
         }
         [HttpPost]
         [Route("CustomerDelete")]
-        public async Task<IActionResult> DeleteCustomer([FromBody] CustomerViewModel customer)
+        public async Task<IActionResult> DeleteCustomer([FromBody] long customerID)
         {
-            if (!_context.customers.Any(c => c.CustomerID == customer.CustomerID))
+            if (!_context.customers.Any(c => c.CustomerID == customerID))
             {
                 return NotFound();
             }
 
-            Customer theCustomer = _context.customers.FirstOrDefault(c => c.CustomerID == customer.CustomerID);
+            Customer theCustomer = _context.customers.FirstOrDefault(c => c.CustomerID == customerID);
             theCustomer.IsDeleted = true;
 
             await _context.SaveChangesAsync();
@@ -213,14 +212,14 @@ namespace tenetApi.Controllers
         }
         [HttpPost]
         [Route("CustomerDeleteUndo")]
-        public async Task<IActionResult> DeleteCustomerUndo([FromBody] CustomerViewModel customer)
+        public async Task<IActionResult> DeleteCustomerUndo([FromBody] long customerID)
         {
-            if (!_context.customers.Any(c => c.CustomerID == customer.CustomerID))
+            if (!_context.customers.Any(c => c.CustomerID == customerID))
             {
                 return NotFound();
             }
 
-            Customer theCustomer = _context.customers.FirstOrDefault(c => c.CustomerID == customer.CustomerID);
+            Customer theCustomer = _context.customers.FirstOrDefault(c => c.CustomerID == customerID);
             theCustomer.IsDeleted = false;
 
             await _context.SaveChangesAsync();
@@ -229,14 +228,14 @@ namespace tenetApi.Controllers
         }
         [HttpPost]
         [Route("CustomerActivate")]
-        public async Task<IActionResult> ActivateCustomer([FromBody] CustomerViewModel customer)
+        public async Task<IActionResult> ActivateCustomer([FromBody] long customerID)
         {
-            if (!_context.customers.Any(c => c.CustomerID == customer.CustomerID))
+            if (!_context.customers.Any(c => c.CustomerID == customerID))
             {
                 return NotFound();
             }
 
-            Customer theCustomer = _context.customers.FirstOrDefault(c => c.CustomerID == customer.CustomerID);
+            Customer theCustomer = _context.customers.FirstOrDefault(c => c.CustomerID == customerID);
             theCustomer.IsActive = true;
 
             await _context.SaveChangesAsync();
@@ -245,14 +244,14 @@ namespace tenetApi.Controllers
         }
         [HttpPost]
         [Route("CustomerInactivate")]
-        public async Task<IActionResult> InactivateCustomer([FromBody] CustomerViewModel customer)
+        public async Task<IActionResult> InactivateCustomer([FromBody] long customerID)
         {
-            if (!_context.customers.Any(c => c.CustomerID == customer.CustomerID))
+            if (!_context.customers.Any(c => c.CustomerID == customerID))
             {
                 return NotFound();
             }
 
-            Customer theCustomer = _context.customers.FirstOrDefault(c => c.CustomerID == customer.CustomerID);
+            Customer theCustomer = _context.customers.FirstOrDefault(c => c.CustomerID == customerID);
             theCustomer.IsDeleted = false;
 
             await _context.SaveChangesAsync();

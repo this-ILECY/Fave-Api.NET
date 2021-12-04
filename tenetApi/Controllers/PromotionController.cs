@@ -100,13 +100,13 @@ namespace tenetApi.Controllers
         [Route("AddPromotion")]
         public async Task<ActionResult<PromotionViewModel>> AddPromotion([FromBody] PromotionViewModel promotion)
         {
-            if (_context.promotion.Any(c => c.ProductID == promotion.ProductID && c.IsActive == true))
+            if (_context.promotion.Any(c => c.ProductID == promotion.ProductID))
             {
-                return BadRequest();
+                return BadRequest("this product already has a promotion");
             }
             if (!_context.shops.Any(c => c.ShopID == promotion.ShopID))
             {
-                return BadRequest();
+                return BadRequest("Shop Not found");
             }
             Promotion thePromotion = new Promotion();
             thePromotion.ProductID = promotion.ProductID;

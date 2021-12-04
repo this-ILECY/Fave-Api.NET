@@ -126,15 +126,15 @@ namespace tenetApi.Controllers
             }
             if (_context.shops.Any(c => c.ShopName == shop.ShopName))
             {
-                return BadRequest();
+                return BadRequest("Shop name unavailable!");
             }
             if(_context.shops.Any(c=> c.UserID == shop.UserID))
             {
-                return BadRequest();
+                return BadRequest("Invalid User ID");
             }
             if (!_context.shops.Any(c=> c.ShopCategoryID == shop.ShopCategoryID))
             {
-                return BadRequest();
+                return BadRequest("Invalid ShopCategory");
             }
 
             Shop theShop = new Shop()
@@ -171,15 +171,15 @@ namespace tenetApi.Controllers
             }
             if (!_context.shops.Any(c => c.ShopName == shop.ShopName))
             {
-                return BadRequest();
+                return BadRequest("Name Unavailable!");
             }
             if (!_context.shops.Any(c => c.UserID == shop.UserID))
             {
-                return BadRequest();
+                return BadRequest("Invalid userID");
             }
             if (!_context.shops.Any(c => c.ShopCategoryID == shop.ShopCategoryID))
             {
-                return BadRequest();
+                return BadRequest("Invalid Shop Category!");
             }
 
 

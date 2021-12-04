@@ -32,7 +32,7 @@ namespace tenetApi.Controllers
                 ProductID = c.ProductID,
                 ShopID = c.ShopID,
                 ProductCategoryID = c.ProductCategoryID,
-                ProductTitle = c.ProductTitle,
+                ProductTitle = c.ProductTitle.Replace("_", " "),
                 description = c.description,
                 ProductCode = c.ProductCode,
                 IsDeleted = c.IsDeleted
@@ -61,7 +61,7 @@ namespace tenetApi.Controllers
                 ProductID = c.ProductID,
                 ShopID = c.ShopID,
                 ProductCategoryID = c.ProductCategoryID,
-                ProductTitle = c.ProductTitle,
+                ProductTitle = c.ProductTitle.Replace("_", " "),
                 description = c.description,
                 ProductCode = c.ProductCode,
                 IsDeleted = c.IsDeleted
@@ -71,9 +71,7 @@ namespace tenetApi.Controllers
             {
                 return NotFound();
             }
-            //return Ok();
             return _productViewModel.ToList();
-            // return await _context.products.ToListAsync();
         }
 
         [HttpPost]
@@ -84,16 +82,15 @@ namespace tenetApi.Controllers
             {
                 product.ProductTitle = product.ProductTitle.Replace(" ", "_").ToLower();
             }
-            if (_context.products.Any(c => c.ProductTitle == product.ProductTitle))
-            {
-                return BadRequest();
-            }
             var shopId = _context.shops.FirstOrDefault(c => c.ShopID == product.ShopID);
             var catId = _context.productCategories.FirstOrDefault(c => c.ProductCategoryID == product.ProductCategoryID);
-
-            if (shopId == null || catId == null)
+            if (shopId == null)
             {
-                return BadRequest();
+                return BadRequest("invalid shop!");
+            }
+            if (catId == null)
+            {
+                return BadRequest("invalid category!");
             }
             Product theProduct = new Product();
             theProduct.ProductTitle = product.ProductTitle;
@@ -109,7 +106,6 @@ namespace tenetApi.Controllers
             await _context.SaveChangesAsync();
 
             return Ok();
-            //return CreatedAtAction("GetProduct", new { id = product.ProductID }, product);
         }
 
         [HttpPost]
@@ -127,13 +123,16 @@ namespace tenetApi.Controllers
             var shopId = _context.shops.FirstOrDefault(c => c.ShopID == product.ShopID);
             var catId = _context.productCategories.FirstOrDefault(c => c.ProductCategoryID == product.ProductCategoryID);
 
-            if (shopId == null || catId == null)
+            if (catId == null)
             {
-                return BadRequest();
+                return BadRequest("Category NOT found!");
+            }
+            if (shopId == null)
+            {
+                return BadRequest("shop NOT found!");
             }
 
             Product productToUpdate = _context.products.FirstOrDefault(c => c.ProductID == product.ProductID);
-            productToUpdate.ProductID = product.ProductID;
             productToUpdate.ProductTitle = product.ProductTitle;
             productToUpdate.description = product.description;
             productToUpdate.IsDeleted = product.IsDeleted;
