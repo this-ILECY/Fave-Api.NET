@@ -17,6 +17,7 @@ namespace tenetApi.Model
         public int CellPhone { get; set; }
         [MaxLength(50)]
         public string Email { get; set; }
+        public bool IsActive{ get; set; }
 
         public List<CustomerAddress> custAdresFk {  get; set; }
         public User userFk { get; set; }

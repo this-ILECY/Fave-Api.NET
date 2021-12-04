@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using tenetApi.Context;
 
 namespace tenetApi.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20211204045934_shopCatID")]
+    partial class shopCatID
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -144,9 +146,6 @@ namespace tenetApi.Migrations
                     b.Property<string>("Email")
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
@@ -364,7 +363,7 @@ namespace tenetApi.Migrations
                         .HasMaxLength(300)
                         .HasColumnType("nvarchar(300)");
 
-                    b.Property<long>("ShopCategoryID")
+                    b.Property<long?>("ShopCategoryID")
                         .HasColumnType("bigint");
 
                     b.Property<decimal>("ShopLatitude")
@@ -381,6 +380,9 @@ namespace tenetApi.Migrations
                         .HasColumnType("int");
 
                     b.Property<long>("UserID")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("shopCatID")
                         .HasColumnType("bigint");
 
                     b.HasKey("ShopID");
@@ -416,7 +418,7 @@ namespace tenetApi.Migrations
 
                     b.HasKey("ShopCategoryID");
 
-                    b.ToTable("shopCategories");
+                    b.ToTable("ShopCategory");
                 });
 
             modelBuilder.Entity("tenetApi.Model.User", b =>
@@ -611,8 +613,7 @@ namespace tenetApi.Migrations
                     b.HasOne("tenetApi.Model.ShopCategory", "shopCategoryFk")
                         .WithMany("shopFk")
                         .HasForeignKey("ShopCategoryID")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("tenetApi.Model.User", "userFk")
                         .WithOne("shopFk")

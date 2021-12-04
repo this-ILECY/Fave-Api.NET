@@ -2,10 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using tenetApi.Context;
 using tenetApi.Model;
 using tenetApi.ViewModel;
@@ -112,7 +109,6 @@ namespace tenetApi.Controllers
                 return BadRequest();
             }
             Promotion thePromotion = new Promotion();
-            thePromotion.PromotionID = _context.promotion.Max(c => c.PromotionID) + 1;
             thePromotion.ProductID = promotion.ProductID;
             thePromotion.ShopID = promotion.ShopID;
             thePromotion.BasePrice = promotion.BasePrice;
@@ -123,7 +119,7 @@ namespace tenetApi.Controllers
             thePromotion.EndDate = promotion.EndDate;
             thePromotion.IsActive = promotion.IsActive;
             thePromotion.IsDeleted = promotion.IsDeleted;
-            thePromotion.CreatedDate = promotion.CreatedDate;
+            thePromotion.CreatedDate = DateTime.Now;
             thePromotion.productFk = _context.products.FirstOrDefault(c=> c.ProductID == promotion.ProductID);
             thePromotion.shopFk = _context.shops.FirstOrDefault(c=> c.ShopID == promotion.ShopID);
 
@@ -171,8 +167,8 @@ namespace tenetApi.Controllers
         //    return Ok();
         //}
         [HttpPost]
-        [Route("ProductDelete")]
-        public async Task<IActionResult> DeleteProduct([FromBody] long promotionId)
+        [Route("PromotionDelete")]
+        public async Task<IActionResult> DeletePromotion([FromBody] long promotionId)
         {
 
             if (!_context.promotion.Any(c => c.PromotionID == promotionId))
@@ -189,8 +185,8 @@ namespace tenetApi.Controllers
             return Ok();
         }
         [HttpPost]
-        [Route("ProductDeleteUndo")]
-        public async Task<IActionResult> DeleteProductUndo([FromBody] long promotionId)
+        [Route("PromotionDeleteUndo")]
+        public async Task<IActionResult> DeletePromotionUndo([FromBody] long promotionId)
         {
 
             if (!_context.promotion.Any(c => c.PromotionID == promotionId))
@@ -200,6 +196,42 @@ namespace tenetApi.Controllers
 
             Promotion productToDelete = _context.promotion.FirstOrDefault(c => c.PromotionID == promotionId);
             productToDelete.IsDeleted = false;
+
+
+            await _context.SaveChangesAsync();
+
+            return Ok();
+        }
+        [HttpPost]
+        [Route("PromotionActivate")]
+        public async Task<IActionResult> ActivatePromotion([FromBody] long promotionId)
+        {
+
+            if (!_context.promotion.Any(c => c.PromotionID == promotionId))
+            {
+                return NotFound();
+            }
+
+            Promotion productToDelete = _context.promotion.FirstOrDefault(c => c.PromotionID == promotionId);
+            productToDelete.IsActive = true;
+
+
+            await _context.SaveChangesAsync();
+
+            return Ok();
+        }
+        [HttpPost]
+        [Route("PromotionInactivate")]
+        public async Task<IActionResult> InactivatePromotion([FromBody] long promotionId)
+        {
+
+            if (!_context.promotion.Any(c => c.PromotionID == promotionId))
+            {
+                return NotFound();
+            }
+
+            Promotion productToDelete = _context.promotion.FirstOrDefault(c => c.PromotionID == promotionId);
+            productToDelete.IsActive = false;
 
 
             await _context.SaveChangesAsync();

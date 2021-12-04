@@ -17,6 +17,7 @@ namespace tenetApi.Context
         public DbSet<Product> products { get; set; }
         public DbSet<Promotion> promotion { get; set; }
         public DbSet<ProductCategory> productCategories { get; set; }
+        public DbSet<ShopCategory> shopCategories { get; set; }
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);

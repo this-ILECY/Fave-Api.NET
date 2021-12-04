@@ -1,17 +1,13 @@
-﻿using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
+﻿using tenetApi.Model;
 
-namespace tenetApi.Model
+namespace tenetApi.ViewModel
 {
-    public class Shop : ModelBase
+    public class ShopViewModel :ModelBase
     {
-        [Key]
         public long ShopID { get; set; }
         public long UserID { get; set; }
         public long ShopCategoryID { get; set; }
-        [MaxLength(30)]
         public string ShopName { get; set; }
-        [MaxLength(300)]
         public string ShopAddress { get; set; }
         public int TelePhone { get; set; }
         public int CellPhone { get; set; }
@@ -19,8 +15,5 @@ namespace tenetApi.Model
         public decimal ShopLongitude { get; set; }
         public bool IsActive { get; set; }
 
-        public User userFk { get; set; }
-        public List<Product> productFk { get; set; }
-        public ShopCategory shopCategoryFk { get; set; }
     }
 }

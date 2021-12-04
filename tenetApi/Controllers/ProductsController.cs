@@ -51,6 +51,11 @@ namespace tenetApi.Controllers
         [Route("ProductByTitle")]
         public async Task<ActionResult<IEnumerable<ProductViewModel>>> GetproductsByTitle([FromBody] string ProductTitle)
         {
+            ProductTitle = ProductTitle.ToLower();
+            if (ProductTitle.Contains(" "))
+            {
+                ProductTitle = ProductTitle.Replace(" ", "_").ToLower();
+            }
             _productViewModel = _context.products.Select(c => new ProductViewModel()
             {
                 ProductID = c.ProductID,
@@ -73,8 +78,12 @@ namespace tenetApi.Controllers
 
         [HttpPost]
         [Route("AddProduct")]
-        public async Task<ActionResult<ProductViewModel>> PostProduct([FromBody] ProductViewModel product)
+        public async Task<ActionResult<ProductViewModel>> AddProduct([FromBody] ProductViewModel product)
         {
+            if (product.ProductTitle.Contains(" "))
+            {
+                product.ProductTitle = product.ProductTitle.Replace(" ", "_").ToLower();
+            }
             if (_context.products.Any(c => c.ProductTitle == product.ProductTitle))
             {
                 return BadRequest();
@@ -87,13 +96,13 @@ namespace tenetApi.Controllers
                 return BadRequest();
             }
             Product theProduct = new Product();
-            theProduct.ProductID = _context.products.Max(c => c.ProductID) + 1;
             theProduct.ProductTitle = product.ProductTitle;
             theProduct.description = product.description;
             theProduct.IsDeleted = product.IsDeleted;
             theProduct.ProductCode = product.ProductCode;
             theProduct.productCategoryFk = catId;
             theProduct.shopFk = shopId;
+            theProduct.CreatedDate = DateTime.Now;
 
 
             _context.products.Add(theProduct);
@@ -107,6 +116,10 @@ namespace tenetApi.Controllers
         [Route("ProductUpdate")]
         public async Task<IActionResult> UpdateProduct([FromBody] ProductViewModel product)
         {
+            if (product.ProductTitle.Contains(" "))
+            {
+                product.ProductTitle = product.ProductTitle.Replace(" ", "_").ToLower();
+            }
             if (!_context.products.Any(c => c.ProductID == product.ProductID))
             {
                 return NotFound();

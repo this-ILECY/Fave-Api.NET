@@ -33,6 +33,10 @@ namespace tenetApi.Controllers
 
         public async Task<IActionResult> Register([FromBody] SignInUpModel login)
         {
+            if(login.UserName.Contains(" "))
+            {
+                login.UserName = login.UserName.Replace(" ", "_").ToLower();
+            }
             var userExists = await userManager.FindByNameAsync(login.UserName);
             if (userExists != null)
                 return BadRequest();
@@ -54,6 +58,10 @@ namespace tenetApi.Controllers
 
         public async Task<IActionResult> Login([FromBody] SignInUpModel login)
         {
+            if (login.UserName.Contains(" "))
+            {
+                login.UserName = login.UserName.Replace(" ", "_").ToLower();
+            }
             var user = await userManager.FindByNameAsync(login.UserName);
             if (user != null && await userManager.CheckPasswordAsync(user, login.UserPassword))
             {
