@@ -19,9 +19,9 @@ namespace tenetApi.Controllers
         {
             _context = context;
         }
-        [HttpPost]
+        [HttpGet]
         [Route("CustomerByID")]
-        public async Task<ActionResult<IEnumerable<CustomerViewModel>>> GetCustomerByID([FromBody] long CustomerID)
+        public async Task<ActionResult<IEnumerable<CustomerViewModel>>> GetCustomerByID(long CustomerID)
         {
             _customerViewModel = _context.customers.Select(c => new CustomerViewModel()
             {
@@ -42,9 +42,9 @@ namespace tenetApi.Controllers
             return _customerViewModel.ToList();
 
         }
-        [HttpPost]
+        [HttpGet]
         [Route("CustomerByName")]
-        public async Task<ActionResult<IEnumerable<CustomerViewModel>>> GetCustomerByName([FromBody] string CustomerName)
+        public async Task<ActionResult<IEnumerable<CustomerViewModel>>> GetCustomerByName(string CustomerName)
         {
             _customerViewModel = _context.customers.Select(c => new CustomerViewModel()
             {
@@ -63,9 +63,10 @@ namespace tenetApi.Controllers
             }
             return _customerViewModel.ToList();
         }
-        [HttpPost]
+
+        [HttpGet]
         [Route("CustomerByEmail")]
-        public async Task<ActionResult<IEnumerable<CustomerViewModel>>> GetCustomerByEmail([FromBody] string CustomerEmail)
+        public async Task<ActionResult<IEnumerable<CustomerViewModel>>> GetCustomerByEmail(string CustomerEmail)
         {
             _customerViewModel = _context.customers.Select(c => new CustomerViewModel()
             {
@@ -84,9 +85,10 @@ namespace tenetApi.Controllers
             }
             return _customerViewModel.ToList();
         }
-        [HttpPost]
+
+        [HttpGet]
         [Route("CustomerByTelephone")]
-        public async Task<ActionResult<IEnumerable<CustomerViewModel>>> GetCustomerByTelephone([FromBody] string CustomerTelephone)
+        public async Task<ActionResult<IEnumerable<CustomerViewModel>>> GetCustomerByTelephone(string CustomerTelephone)
         {
             if (CustomerTelephone.StartsWith("0"))//telephone is "long" and does
             {
@@ -109,9 +111,10 @@ namespace tenetApi.Controllers
             }
             return _customerViewModel.ToList();
         }
-        [HttpPost]
+
+        [HttpGet]
         [Route("CustomerByCellphone")]
-        public async Task<ActionResult<IEnumerable<CustomerViewModel>>> GetCustomerByCellphone([FromBody] string CustomerCellphone)
+        public async Task<ActionResult<IEnumerable<CustomerViewModel>>> GetCustomerByCellphone(string CustomerCellphone)
         {
             if (CustomerCellphone.StartsWith("0"))
             {
@@ -134,6 +137,7 @@ namespace tenetApi.Controllers
             }
             return _customerViewModel.ToList();
         }
+        
         [HttpPost]
         [Route("CustomerAdd")]
         public async Task<ActionResult<CustomerViewModel>> AddCustomer([FromBody] CustomerViewModel customer)
@@ -168,7 +172,8 @@ namespace tenetApi.Controllers
 
             return Ok();
         }
-        [HttpPost]
+        
+        [HttpPut]
         [Route("CustomerUpdate")]
         public async Task<IActionResult> UpdateCustomer([FromBody] CustomerViewModel customer)
         {
@@ -194,9 +199,10 @@ namespace tenetApi.Controllers
 
             return Ok();
         }
-        [HttpPost]
+        
+        [HttpDelete]
         [Route("CustomerDelete")]
-        public async Task<IActionResult> DeleteCustomer([FromBody] long customerID)
+        public async Task<IActionResult> DeleteCustomer(long customerID)
         {
             if (!_context.customers.Any(c => c.CustomerID == customerID))
             {
@@ -210,9 +216,10 @@ namespace tenetApi.Controllers
 
             return Ok();
         }
+        
         [HttpPost]
         [Route("CustomerDeleteUndo")]
-        public async Task<IActionResult> DeleteCustomerUndo([FromBody] long customerID)
+        public async Task<IActionResult> DeleteCustomerUndo(long customerID)
         {
             if (!_context.customers.Any(c => c.CustomerID == customerID))
             {
@@ -226,9 +233,10 @@ namespace tenetApi.Controllers
 
             return Ok();
         }
+        
         [HttpPost]
         [Route("CustomerActivate")]
-        public async Task<IActionResult> ActivateCustomer([FromBody] long customerID)
+        public async Task<IActionResult> ActivateCustomer(long customerID)
         {
             if (!_context.customers.Any(c => c.CustomerID == customerID))
             {
@@ -242,9 +250,10 @@ namespace tenetApi.Controllers
 
             return Ok();
         }
-        [HttpPost]
+        
+        [HttpDelete]
         [Route("CustomerInactivate")]
-        public async Task<IActionResult> InactivateCustomer([FromBody] long customerID)
+        public async Task<IActionResult> InactivateCustomer(long customerID)
         {
             if (!_context.customers.Any(c => c.CustomerID == customerID))
             {

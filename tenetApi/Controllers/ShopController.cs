@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using tenetApi.Context;
+using tenetApi.Exception;
 using tenetApi.Model;
 using tenetApi.ViewModel;
 
@@ -21,9 +22,9 @@ namespace tenetApi.Controllers
                 _context = context;
         }
 
-        [HttpPost]
+        [HttpGet]
         [Route("ShopByID")]
-        public async Task<ActionResult<IEnumerable<ShopViewModel>>> GetShopByID([FromBody] long ShopID)
+        public async Task<ActionResult<IEnumerable<ShopViewModel>>> GetShopByID(long ShopID)
         {
             _shopViewModel = _context.shops.Select(c => new ShopViewModel()
             {
@@ -50,9 +51,9 @@ namespace tenetApi.Controllers
             return _shopViewModel.ToList();
         }
 
-        [HttpPost]
+        [HttpGet]
         [Route("ShopByName")]
-        public async Task<ActionResult<IEnumerable<ShopViewModel>>> GetShopByName([FromBody] string ShopName)
+        public async Task<ActionResult<IEnumerable<ShopViewModel>>> GetShopByName(string ShopName)
         {
             ShopName = ShopName.ToLower();
             if(ShopName.Contains(" "))
@@ -84,9 +85,9 @@ namespace tenetApi.Controllers
             return _shopViewModel.ToList();
         }
 
-        [HttpPost]
+        [HttpGet]
         [Route("ShopByAddress")]
-        public async Task<ActionResult<IEnumerable<ShopViewModel>>> GetShopByAddress([FromBody] string ShopAddress)
+        public async Task<ActionResult<IEnumerable<ShopViewModel>>> GetShopByAddress(string ShopAddress)
         {
             ShopAddress = ShopAddress.ToLower();
             
@@ -137,30 +138,40 @@ namespace tenetApi.Controllers
                 return BadRequest("Invalid ShopCategory");
             }
 
-            Shop theShop = new Shop()
+            try
             {
-                ShopName = shop.ShopName,
-                IsActive = shop.IsActive,
-                CreatedDate = DateTime.Now,
-                ShopCategoryID = shop.ShopCategoryID,
-                CellPhone = shop.CellPhone,
-                IsDeleted = shop.IsDeleted,
-                ShopAddress = shop.ShopAddress,
-                ShopLatitude = shop.ShopLatitude,
-                ShopLongitude = shop.ShopLongitude,
-                TelePhone = shop.TelePhone,
-                UserID = shop.UserID,
-                shopCategoryFk = _context.shopCategories.FirstOrDefault(c=> c.ShopCategoryID == shop.ShopCategoryID),
-                userFk = _context.Users.FirstOrDefault(c=> c.Id == shop.UserID)
-            };
 
-            _context.shops.Add(theShop);
-            await _context.SaveChangesAsync();
+                Shop theShop = new Shop()
+                {
+                    ShopID = shop.ShopID,
+                    ShopName = shop.ShopName,
+                    IsActive = shop.IsActive,
+                    CreatedDate = DateTime.Now,
+                    ShopCategoryID = shop.ShopCategoryID,
+                    CellPhone = shop.CellPhone,
+                    IsDeleted = shop.IsDeleted,
+                    ShopAddress = shop.ShopAddress,
+                    ShopLatitude = shop.ShopLatitude,
+                    ShopLongitude = shop.ShopLongitude,
+                    TelePhone = shop.TelePhone,
+                    UserID = shop.UserID,
+                    shopCategoryFk = _context.shopCategories.FirstOrDefault(c => c.ShopCategoryID == shop.ShopCategoryID),
+                    userFk = _context.Users.FirstOrDefault(c => c.Id == shop.UserID)
+                };
 
+                _context.shops.Add(theShop);
+                await _context.SaveChangesAsync();
+
+            }
+            catch (System.Exception e)
+            {
+                var msg = Log.Error(e.Message);
+                return BadRequest();
+            }
             return Ok();
         }
-
-        [HttpPost]
+        
+        [HttpPut]
         [Route("UpdateShop")]
         public async Task<ActionResult<ShopViewModel>> UpdateShop([FromBody] ShopViewModel shop)
         {
@@ -204,9 +215,10 @@ namespace tenetApi.Controllers
 
             return Ok();
         }
-        [HttpPost]
+        
+        [HttpDelete]
         [Route("ShopDelete")]
-        public async Task<IActionResult> DeleteShop([FromBody] long shopId)
+        public async Task<IActionResult> DeleteShop(long shopId)
         {
 
             if (!_context.shops.Any(c => c.ShopID == shopId))
@@ -221,9 +233,10 @@ namespace tenetApi.Controllers
 
             return Ok();
         }
+        
         [HttpPost]
         [Route("ShopDeleteUndo")]
-        public async Task<IActionResult> UndoDeleteShop([FromBody] long shopId)
+        public async Task<IActionResult> UndoDeleteShop(long shopId)
         {
 
             if (!_context.shops.Any(c => c.ShopID == shopId))
@@ -238,9 +251,10 @@ namespace tenetApi.Controllers
 
             return Ok();
         }
-        [HttpPost]
+        
+        [HttpDelete]
         [Route("ShopInactivate")]
-        public async Task<IActionResult> InactivateShop([FromBody] long shopId)
+        public async Task<IActionResult> InactivateShop(long shopId)
         {
 
             if (!_context.shops.Any(c => c.ShopID == shopId))
@@ -255,9 +269,10 @@ namespace tenetApi.Controllers
 
             return Ok();
         }
+        
         [HttpPost]
         [Route("ShopActivate")]
-        public async Task<IActionResult> ActivateShop([FromBody] long shopId)
+        public async Task<IActionResult> ActivateShop(long shopId)
         {
 
             if (!_context.shops.Any(c => c.ShopID == shopId))

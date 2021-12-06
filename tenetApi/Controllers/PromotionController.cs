@@ -19,9 +19,9 @@ namespace tenetApi.Controllers
         {
             _context = context;
         }
-        [HttpPost]
+        [HttpGet]
         [Route("PromotionByID")]
-        public async Task<ActionResult<IEnumerable<PromotionViewModel>>> GetpromotionsByID([FromBody] long PromotionID)
+        public async Task<ActionResult<IEnumerable<PromotionViewModel>>> GetpromotionsByID(long PromotionID)
         {
             _promotionViewModel = _context.promotion.Select(c => new PromotionViewModel()
             {
@@ -46,9 +46,10 @@ namespace tenetApi.Controllers
             return _promotionViewModel.ToList();
 
         }
-        [HttpPost]
+
+        [HttpGet]
         [Route("promotionByProductID")]
-        public async Task<ActionResult<IEnumerable<PromotionViewModel>>> GetpromotionsByProductID([FromBody] long ProductID)
+        public async Task<ActionResult<IEnumerable<PromotionViewModel>>> GetpromotionsByProductID(long ProductID)
         {
             _promotionViewModel = _context.promotion.Select(c => new PromotionViewModel()
             {
@@ -71,9 +72,10 @@ namespace tenetApi.Controllers
             }
             return _promotionViewModel.ToList();
         }
-        [HttpPost]
+
+        [HttpGet]
         [Route("promotionByShopID")]
-        public async Task<ActionResult<IEnumerable<PromotionViewModel>>> GetpromotionsByShopID([FromBody] long ShopID)
+        public async Task<ActionResult<IEnumerable<PromotionViewModel>>> GetpromotionsByShopID(long ShopID)
         {
             _promotionViewModel = _context.promotion.Select(c => new PromotionViewModel()
             {
@@ -96,6 +98,7 @@ namespace tenetApi.Controllers
             }
             return _promotionViewModel.ToList();
         }
+
         [HttpPost]
         [Route("AddPromotion")]
         public async Task<ActionResult<PromotionViewModel>> AddPromotion([FromBody] PromotionViewModel promotion)
@@ -129,46 +132,48 @@ namespace tenetApi.Controllers
 
             return Ok();
         }
-        //PromotionUpdate:
-        //[HttpPost]
-        //[Route("PromotionUpdate")]
-        //public async Task<IActionResult> UpdateProduct([FromBody] PromotionViewModel promotion)
-        //{
-        //    if (!_context.promotion.Any(c => c.ProductID == promotion.ProductID))
-        //    {
-        //        return NotFound();
-        //    }
-        //    var shopId = _context.shops.FirstOrDefault(c => c.ShopID == promotion.ShopID);
-        //    var proId = _context.products.FirstOrDefault(c => c.ProductID == promotion.ProductID);
 
-        //    if (shopId == null || proId == null)
-        //    {
-        //        return BadRequest();
-        //    }
+        //PromotionUpdate: has been commented!
+        [HttpPut]
+        [Route("PromotionUpdate")]
+        public async Task<IActionResult> UpdateProduct([FromBody] PromotionViewModel promotion)
+        {
+            if (!_context.promotion.Any(c => c.ProductID == promotion.ProductID))
+            {
+                return NotFound();
+            }
+            var shopId = _context.shops.FirstOrDefault(c => c.ShopID == promotion.ShopID);
+            var proId = _context.products.FirstOrDefault(c => c.ProductID == promotion.ProductID);
 
-        //    Promotion promotionToUpdate = _context.promotion.FirstOrDefault(c => c.PromotionID == promotion.PromotionID);
-        //    promotionToUpdate.ProductID = promotion.ProductID;
-        //    promotionToUpdate.ShopID = promotion.ShopID;
-        //    promotionToUpdate.BasePrice = promotion.BasePrice;
-        //    promotionToUpdate.DiscountPrice = promotion.DiscountPrice;
-        //    promotionToUpdate.Stock = promotion.Stock;
-        //    promotionToUpdate.QualityGrade = promotion.QualityGrade;
-        //    promotionToUpdate.EndTime = promotion.EndTime;
-        //    promotionToUpdate.EndDate = promotion.EndDate;
-        //    promotionToUpdate.IsActive = promotion.IsActive;
-        //    promotionToUpdate.IsDeleted = promotion.IsDeleted;
-        //    promotionToUpdate.CreatedDate = promotion.CreatedDate;
-        //    promotionToUpdate.productFk = _context.products.FirstOrDefault(c => c.ProductID == promotion.ProductID);
-        //    promotionToUpdate.shopFk = _context.shops.FirstOrDefault(c => c.ShopID == promotion.ShopID);
+            if (shopId == null || proId == null)
+            {
+                return BadRequest();
+            }
+
+            Promotion promotionToUpdate = _context.promotion.FirstOrDefault(c => c.PromotionID == promotion.PromotionID);
+            promotionToUpdate.ProductID = promotion.ProductID;
+            promotionToUpdate.ShopID = promotion.ShopID;
+            promotionToUpdate.BasePrice = promotion.BasePrice;
+            promotionToUpdate.DiscountPrice = promotion.DiscountPrice;
+            promotionToUpdate.Stock = promotion.Stock;
+            promotionToUpdate.QualityGrade = promotion.QualityGrade;
+            promotionToUpdate.EndTime = promotion.EndTime;
+            promotionToUpdate.EndDate = promotion.EndDate;
+            promotionToUpdate.IsActive = promotion.IsActive;
+            promotionToUpdate.IsDeleted = promotion.IsDeleted;
+            promotionToUpdate.CreatedDate = promotion.CreatedDate;
+            promotionToUpdate.productFk = _context.products.FirstOrDefault(c => c.ProductID == promotion.ProductID);
+            promotionToUpdate.shopFk = _context.shops.FirstOrDefault(c => c.ShopID == promotion.ShopID);
 
 
-        //    await _context.SaveChangesAsync();
+            await _context.SaveChangesAsync();
 
-        //    return Ok();
-        //}
-        [HttpPost]
+            return Ok();
+        }
+
+        [HttpDelete]
         [Route("PromotionDelete")]
-        public async Task<IActionResult> DeletePromotion([FromBody] long promotionId)
+        public async Task<IActionResult> DeletePromotion(long promotionId)
         {
 
             if (!_context.promotion.Any(c => c.PromotionID == promotionId))
@@ -184,9 +189,10 @@ namespace tenetApi.Controllers
 
             return Ok();
         }
+
         [HttpPost]
         [Route("PromotionDeleteUndo")]
-        public async Task<IActionResult> DeletePromotionUndo([FromBody] long promotionId)
+        public async Task<IActionResult> DeletePromotionUndo(long promotionId)
         {
 
             if (!_context.promotion.Any(c => c.PromotionID == promotionId))
@@ -202,9 +208,10 @@ namespace tenetApi.Controllers
 
             return Ok();
         }
+
         [HttpPost]
         [Route("PromotionActivate")]
-        public async Task<IActionResult> ActivatePromotion([FromBody] long promotionId)
+        public async Task<IActionResult> ActivatePromotion(long promotionId)
         {
 
             if (!_context.promotion.Any(c => c.PromotionID == promotionId))
@@ -220,9 +227,10 @@ namespace tenetApi.Controllers
 
             return Ok();
         }
-        [HttpPost]
+
+        [HttpDelete]
         [Route("PromotionInactivate")]
-        public async Task<IActionResult> InactivatePromotion([FromBody] long promotionId)
+        public async Task<IActionResult> InactivatePromotion(long promotionId)
         {
 
             if (!_context.promotion.Any(c => c.PromotionID == promotionId))

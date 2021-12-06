@@ -19,10 +19,10 @@ namespace tenetApi.Controllers
         {
             _context = context;
         }
-        // list of each customer addresses
-        [HttpPost]
+
+        [HttpGet]
         [Route("AddressByCustomerID")] 
-        public async Task<ActionResult<IEnumerable<CustomerAddressViewModel>>> GetAddressByCustomerID([FromBody] long CustomerID)
+        public async Task<ActionResult<IEnumerable<CustomerAddressViewModel>>> GetAddressByCustomerID(long CustomerID)
         {
             _customerAddressViewModel = _context.customerAddresses.Select(c => new CustomerAddressViewModel()
             {
@@ -42,7 +42,7 @@ namespace tenetApi.Controllers
             
             return _customerAddressViewModel.ToList();
         }
-        //create a new address for customer
+
         [HttpPost]
         [Route("CustomerAddressAdd")]
         public async Task<ActionResult> AddCustomerAddress([FromBody] CustomerAddressViewModel customerAddress)
@@ -73,8 +73,8 @@ namespace tenetApi.Controllers
 
             return Ok();
         }
-        //make changes in addresses
-        [HttpPost]
+
+        [HttpPut]
         [Route("CustomerAddressUpdate")]
         public async Task<ActionResult<CustomerViewModel>> UpdateCustomer([FromBody] CustomerAddressViewModel customerAddress)
         {
@@ -97,9 +97,10 @@ namespace tenetApi.Controllers
 
             return Ok();
         }
-        [HttpPost]
+        
+        [HttpDelete]
         [Route("CustomerAddressDelete")]
-        public async Task<ActionResult<CustomerViewModel>> DeleteCustomer([FromBody] long customerAddressID)
+        public async Task<ActionResult<CustomerViewModel>> DeleteCustomer(long customerAddressID)
         {
 
             CustomerAddress theCustomerAddress = _context.customerAddresses.FirstOrDefault(c => c.CustomerAddressID == customerAddressID);
@@ -109,9 +110,10 @@ namespace tenetApi.Controllers
 
             return Ok();
         }
+        
         [HttpPost]
         [Route("CustomerAddressUndoDelete")]
-        public async Task<ActionResult<CustomerViewModel>> UndoDeleteCustomer([FromBody] long customerAddressID)
+        public async Task<ActionResult<CustomerViewModel>> UndoDeleteCustomer(long customerAddressID)
         {
 
             CustomerAddress theCustomerAddress = _context.customerAddresses.FirstOrDefault(c => c.CustomerAddressID == customerAddressID);

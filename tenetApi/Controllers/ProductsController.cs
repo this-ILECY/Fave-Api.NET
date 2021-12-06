@@ -14,6 +14,7 @@ namespace tenetApi.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    //[Authorize]
     public class ProductsController : ControllerBase
     {
         private readonly AppDbContext _context;
@@ -23,9 +24,9 @@ namespace tenetApi.Controllers
             _context = context;
         }
 
-        [HttpPost]
+        [HttpGet]
         [Route("ProductByID")]
-        public async Task<ActionResult<IEnumerable<ProductViewModel>>> GetproductsByID([FromBody] long ProductID)
+        public async Task<ActionResult<IEnumerable<ProductViewModel>>> GetproductsByID(long ProductID)
         {
             _productViewModel = _context.products.Select(c => new ProductViewModel()
             {
@@ -47,9 +48,9 @@ namespace tenetApi.Controllers
 
         }
 
-        [HttpPost]
+        [HttpGet]
         [Route("ProductByTitle")]
-        public async Task<ActionResult<IEnumerable<ProductViewModel>>> GetproductsByTitle([FromBody] string ProductTitle)
+        public async Task<ActionResult<IEnumerable<ProductViewModel>>> GetproductsByTitle(string ProductTitle)
         {
             ProductTitle = ProductTitle.ToLower();
             if (ProductTitle.Contains(" "))
@@ -82,7 +83,7 @@ namespace tenetApi.Controllers
             {
                 product.ProductTitle = product.ProductTitle.Replace(" ", "_").ToLower();
             }
-            var shopId = _context.shops.FirstOrDefault(c => c.ShopID == product.ShopID);
+            var shopId = await _context.shops.FirstOrDefaultAsync(c => c.ShopID == product.ShopID);
             var catId = _context.productCategories.FirstOrDefault(c => c.ProductCategoryID == product.ProductCategoryID);
             if (shopId == null)
             {
@@ -108,7 +109,7 @@ namespace tenetApi.Controllers
             return Ok();
         }
 
-        [HttpPost]
+        [HttpPut]
         [Route("ProductUpdate")]
         public async Task<IActionResult> UpdateProduct([FromBody] ProductViewModel product)
         {
@@ -146,9 +147,9 @@ namespace tenetApi.Controllers
             return Ok();
         }
 
-        [HttpPost]
+        [HttpDelete]
         [Route("ProductDelete")]
-        public async Task<IActionResult> DeleteProduct([FromBody] long productId)
+        public async Task<IActionResult> DeleteProduct(long productId)
         {
 
             if (!_context.products.Any(c => c.ProductID == productId))
@@ -167,7 +168,7 @@ namespace tenetApi.Controllers
 
         [HttpPost]
         [Route("ProductDeleteUndo")]
-        public async Task<IActionResult> UnDeleteProduct([FromBody] long productId)
+        public async Task<IActionResult> UnDeleteProduct(long productId)
         {
 
             if (!_context.products.Any(c => c.ProductID == productId))
