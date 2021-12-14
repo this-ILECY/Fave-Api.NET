@@ -6,10 +6,14 @@ using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
+using System.Linq;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
+using tenetApi.Exception;
 using tenetApi.Model;
+using System.Net.Mail;
+using System.Text.RegularExpressions;
 
 namespace tenetApi.Controllers
 {
@@ -33,22 +37,50 @@ namespace tenetApi.Controllers
 
         public async Task<IActionResult> Register([FromBody] SignInUpModel login)
         {
-            if(login.UserName.Contains(" "))
+            if (login.UserName.Contains(" "))
             {
                 login.UserName = login.UserName.Replace(" ", "_").ToLower();
             }
-            var userExists = await userManager.FindByNameAsync(login.UserName);
-            if (userExists != null)
-                return BadRequest();
+
+
+            var userNameExists = await userManager.FindByNameAsync(login.UserName);
+            var userEmailExists = await userManager.FindByNameAsync(login.Email);
+            var userPhoneExists = await userManager.FindByNameAsync(login.Phone);
+            if (userNameExists != null)
+                return BadRequest(Responses.BadResponde("user", "duplicate"));
+            if (userEmailExists != null)
+                return BadRequest(Responses.BadResponde("email", "duplicate"));
+            if (userPhoneExists != null)
+                return BadRequest(Responses.BadResponde("phone", "duplicate"));
+
+
             User user = new User()
             {
                 SecurityStamp = Guid.NewGuid().ToString(),
                 UserName = login.UserName,
+                Email = login.Email,
+                PhoneNumber = login.Phone
             };
             var result = await userManager.CreateAsync(user, login.UserPassword);
-            if (!result.Succeeded)
-                return BadRequest();
-            return Ok();
+
+            if (result.Succeeded)
+            {
+                var role = await userManager.AddToRoleAsync(user, login.Role);
+                if (!role.Succeeded == true)
+                {
+                    return BadRequest(Responses.BadResponde("user", "invalid") + " " + result);
+                }
+                return Ok(Responses.OkResponse("login", "add"));
+            }
+            else
+            {
+                return BadRequest(Responses.BadResponde("user", "invalid") + " " + result);
+            }
+
+
+
+
+
 
         }
 
@@ -62,9 +94,34 @@ namespace tenetApi.Controllers
             {
                 login.UserName = login.UserName.Replace(" ", "_").ToLower();
             }
-            var user = await userManager.FindByNameAsync(login.UserName);
-            if (user != null && await userManager.CheckPasswordAsync(user, login.UserPassword))
+            var role = await roleManager.RoleExistsAsync(login.Role);
+            var emailformat = Regex.IsMatch(login.UserName, @"^[^@\s]+@[^@\s]+\.[^@\s]+$");
+            var phoneformat = Regex.IsMatch(login.UserName, @"^\d");
+            User user = new User();
+            if (emailformat)
             {
+                user = await userManager.FindByEmailAsync(login.UserName);
+            }
+            else if (phoneformat)
+            {
+                user = await userManager.FindByEmailAsync(login.UserName);
+            }
+            else
+            {
+                user = await userManager.FindByNameAsync(login.UserName);
+
+            }
+
+
+            if (user == null || await userManager.CheckPasswordAsync(user, login.UserPassword))
+            {
+                return BadRequest(Responses.BadResponde("login credentials", "invalid"));
+            }
+            else
+            {
+                //}
+                //if (role == true && user != null)
+                //{
                 var userRoles = await userManager.GetRolesAsync(user);
                 var authClaims = new List<Claim>
                 {
@@ -81,6 +138,7 @@ namespace tenetApi.Controllers
                 audience: _configuration["JWT:Audience"],
                 expires: DateTime.Now.AddMinutes(10),
                 claims: authClaims,
+
                 signingCredentials: new SigningCredentials(authSigningKey, SecurityAlgorithms.HmacSha256)
                 );
                 return Ok(new
@@ -91,6 +149,5 @@ namespace tenetApi.Controllers
             }
             return Unauthorized();
         }
-
     }
 }

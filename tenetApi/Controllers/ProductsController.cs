@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using tenetApi.Context;
+using tenetApi.Exception;
 using tenetApi.Model;
 using tenetApi.ViewModel;
 
@@ -18,7 +19,6 @@ namespace tenetApi.Controllers
     public class ProductsController : ControllerBase
     {
         private readonly AppDbContext _context;
-        private IEnumerable<ProductViewModel> _productViewModel { get; set; }
         public ProductsController(AppDbContext context)
         {
             _context = context;
@@ -28,7 +28,8 @@ namespace tenetApi.Controllers
         [Route("ProductByID")]
         public async Task<ActionResult<IEnumerable<ProductViewModel>>> GetproductsByID(long ProductID)
         {
-            _productViewModel = _context.products.Select(c => new ProductViewModel()
+            IEnumerable<ProductViewModel> _productViewModelByID;
+            _productViewModelByID = _context.products.Select(c => new ProductViewModel()
             {
                 ProductID = c.ProductID,
                 ShopID = c.ShopID,
@@ -39,12 +40,12 @@ namespace tenetApi.Controllers
                 IsDeleted = c.IsDeleted
             }).ToList().Where(c => c.ProductID == ProductID);
 
-            if (_productViewModel == null)
+            if (_productViewModelByID == null)
             {
-                return NotFound();
+                return NotFound(Responses.NotFound("product"));
             }
 
-            return _productViewModel.ToList();
+            return _productViewModelByID.ToList();
 
         }
 
@@ -52,12 +53,13 @@ namespace tenetApi.Controllers
         [Route("ProductByTitle")]
         public async Task<ActionResult<IEnumerable<ProductViewModel>>> GetproductsByTitle(string ProductTitle)
         {
+            IEnumerable<ProductViewModel> _productViewModelByTitle;
             ProductTitle = ProductTitle.ToLower();
             if (ProductTitle.Contains(" "))
             {
                 ProductTitle = ProductTitle.Replace(" ", "_").ToLower();
             }
-            _productViewModel = _context.products.Select(c => new ProductViewModel()
+            _productViewModelByTitle = _context.products.Select(c => new ProductViewModel()
             {
                 ProductID = c.ProductID,
                 ShopID = c.ShopID,
@@ -68,15 +70,15 @@ namespace tenetApi.Controllers
                 IsDeleted = c.IsDeleted
             }).ToList().Where(c => c.ProductTitle.Contains(ProductTitle));
 
-            if (_productViewModel == null)
+            if (_productViewModelByTitle == null)
             {
-                return NotFound();
+                return NotFound(Responses.NotFound("product"));
             }
-            return _productViewModel.ToList();
+            return _productViewModelByTitle.ToList();
         }
 
         [HttpPost]
-        [Route("AddProduct")]
+        [Route("ProductAdd")]
         public async Task<ActionResult<ProductViewModel>> AddProduct([FromBody] ProductViewModel product)
         {
             if (product.ProductTitle.Contains(" "))
@@ -85,13 +87,13 @@ namespace tenetApi.Controllers
             }
             var shopId = await _context.shops.FirstOrDefaultAsync(c => c.ShopID == product.ShopID);
             var catId = _context.productCategories.FirstOrDefault(c => c.ProductCategoryID == product.ProductCategoryID);
-            if (shopId == null)
-            {
-                return BadRequest("invalid shop!");
-            }
             if (catId == null)
             {
-                return BadRequest("invalid category!");
+                return BadRequest(Responses.BadResponde("product category", "invalid"));
+            }
+            if (shopId == null)
+            {
+                return BadRequest(Responses.BadResponde("shop", "invalid"));
             }
             Product theProduct = new Product();
             theProduct.ProductTitle = product.ProductTitle;
@@ -106,7 +108,7 @@ namespace tenetApi.Controllers
             _context.products.Add(theProduct);
             await _context.SaveChangesAsync();
 
-            return Ok();
+            return Ok(Responses.OkResponse("product", "add"));
         }
 
         [HttpPut]
@@ -119,20 +121,19 @@ namespace tenetApi.Controllers
             }
             if (!_context.products.Any(c => c.ProductID == product.ProductID))
             {
-                return NotFound();
+                return NotFound(Responses.NotFound("product"));
             }
             var shopId = _context.shops.FirstOrDefault(c => c.ShopID == product.ShopID);
             var catId = _context.productCategories.FirstOrDefault(c => c.ProductCategoryID == product.ProductCategoryID);
 
             if (catId == null)
             {
-                return BadRequest("Category NOT found!");
+                return BadRequest(Responses.BadResponde("product category", "invalid"));
             }
             if (shopId == null)
             {
-                return BadRequest("shop NOT found!");
+                return BadRequest(Responses.BadResponde("shop", "invalid"));
             }
-
             Product productToUpdate = _context.products.FirstOrDefault(c => c.ProductID == product.ProductID);
             productToUpdate.ProductTitle = product.ProductTitle;
             productToUpdate.description = product.description;
@@ -144,7 +145,7 @@ namespace tenetApi.Controllers
 
             await _context.SaveChangesAsync();
 
-            return Ok();
+            return Ok(Responses.OkResponse("product", "mod"));
         }
 
         [HttpDelete]
@@ -154,7 +155,7 @@ namespace tenetApi.Controllers
 
             if (!_context.products.Any(c => c.ProductID == productId))
             {
-                return NotFound();
+                return NotFound(Responses.NotFound("product"));
             }
 
             Product productToDelete = _context.products.FirstOrDefault(c => c.ProductID == productId);
@@ -163,7 +164,7 @@ namespace tenetApi.Controllers
 
             await _context.SaveChangesAsync();
 
-            return Ok();
+            return Ok(Responses.OkResponse("product", "del"));
         }
 
         [HttpPost]
@@ -173,7 +174,7 @@ namespace tenetApi.Controllers
 
             if (!_context.products.Any(c => c.ProductID == productId))
             {
-                return NotFound();
+                return NotFound(Responses.NotFound("product"));
             }
 
             Product productToDelete = _context.products.FirstOrDefault(c => c.ProductID == productId);
@@ -183,7 +184,7 @@ namespace tenetApi.Controllers
 
             await _context.SaveChangesAsync();
 
-            return Ok();
+            return Ok(Responses.OkResponse("product", "undel"));
         }
 
 

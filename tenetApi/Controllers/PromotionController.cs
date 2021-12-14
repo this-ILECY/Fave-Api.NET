@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using tenetApi.Context;
+using tenetApi.Exception;
 using tenetApi.Model;
 using tenetApi.ViewModel;
 
@@ -14,7 +15,6 @@ namespace tenetApi.Controllers
     public class PromotionController : ControllerBase
     {
         private readonly AppDbContext _context;
-        private IEnumerable<PromotionViewModel> _promotionViewModel;
         public PromotionController(AppDbContext context)
         {
             _context = context;
@@ -23,7 +23,8 @@ namespace tenetApi.Controllers
         [Route("PromotionByID")]
         public async Task<ActionResult<IEnumerable<PromotionViewModel>>> GetpromotionsByID(long PromotionID)
         {
-            _promotionViewModel = _context.promotion.Select(c => new PromotionViewModel()
+            IEnumerable<PromotionViewModel> _promotionViewModelByID;
+            _promotionViewModelByID = _context.promotion.Select(c => new PromotionViewModel()
             {
                 PromotionID = c.PromotionID,
                 ProductID = c.ProductID,
@@ -38,12 +39,12 @@ namespace tenetApi.Controllers
                 IsDeleted = c.IsDeleted
             }).ToList().Where(c => c.PromotionID == PromotionID);
 
-            if (_promotionViewModel == null)
+            if (_promotionViewModelByID == null)
             {
-                return NotFound();
+                return NotFound(Responses.NotFound("Promotion"));
             }
 
-            return _promotionViewModel.ToList();
+            return Ok(_promotionViewModelByID.ToList());
 
         }
 
@@ -51,7 +52,8 @@ namespace tenetApi.Controllers
         [Route("promotionByProductID")]
         public async Task<ActionResult<IEnumerable<PromotionViewModel>>> GetpromotionsByProductID(long ProductID)
         {
-            _promotionViewModel = _context.promotion.Select(c => new PromotionViewModel()
+            IEnumerable<PromotionViewModel> _promotionViewModelByproductID;
+            _promotionViewModelByproductID = _context.promotion.Select(c => new PromotionViewModel()
             {
                 PromotionID = c.PromotionID,
                 ProductID = c.ProductID,
@@ -66,18 +68,19 @@ namespace tenetApi.Controllers
                 IsDeleted = c.IsDeleted
             }).ToList().Where(c => c.ProductID == ProductID);
 
-            if (_promotionViewModel == null)
+            if (_promotionViewModelByproductID == null)
             {
-                return NotFound();
+                return NotFound(Responses.NotFound("Promotion"));
             }
-            return _promotionViewModel.ToList();
+            return _promotionViewModelByproductID.ToList();
         }
 
         [HttpGet]
         [Route("promotionByShopID")]
         public async Task<ActionResult<IEnumerable<PromotionViewModel>>> GetpromotionsByShopID(long ShopID)
         {
-            _promotionViewModel = _context.promotion.Select(c => new PromotionViewModel()
+            IEnumerable<PromotionViewModel> _promotionViewModelByShopID;
+            _promotionViewModelByShopID = _context.promotion.Select(c => new PromotionViewModel()
             {
                 PromotionID = c.PromotionID,
                 ProductID = c.ProductID,
@@ -92,24 +95,24 @@ namespace tenetApi.Controllers
                 IsDeleted = c.IsDeleted
             }).ToList().Where(c => c.ShopID == ShopID);
 
-            if (_promotionViewModel == null)
+            if (_promotionViewModelByShopID == null)
             {
-                return NotFound();
+                return NotFound(Responses.NotFound("Promotion"));
             }
-            return _promotionViewModel.ToList();
+            return Ok(_promotionViewModelByShopID.ToList());
         }
 
         [HttpPost]
-        [Route("AddPromotion")]
+        [Route("PromotionAdd")]
         public async Task<ActionResult<PromotionViewModel>> AddPromotion([FromBody] PromotionViewModel promotion)
         {
-            if (_context.promotion.Any(c => c.ProductID == promotion.ProductID))
+            if (_context.promotion.Any(c => c.ProductID == promotion.ProductID && c.IsActive == true))
             {
-                return BadRequest("this product already has a promotion");
+                return BadRequest(Responses.BadResponde("promotion", "duplicate"));
             }
             if (!_context.shops.Any(c => c.ShopID == promotion.ShopID))
             {
-                return BadRequest("Shop Not found");
+                return BadRequest(Responses.BadResponde("shop", "invalid"));
             }
             Promotion thePromotion = new Promotion();
             thePromotion.ProductID = promotion.ProductID;
@@ -123,14 +126,14 @@ namespace tenetApi.Controllers
             thePromotion.IsActive = promotion.IsActive;
             thePromotion.IsDeleted = promotion.IsDeleted;
             thePromotion.CreatedDate = DateTime.Now;
-            thePromotion.productFk = _context.products.FirstOrDefault(c=> c.ProductID == promotion.ProductID);
-            thePromotion.shopFk = _context.shops.FirstOrDefault(c=> c.ShopID == promotion.ShopID);
+            thePromotion.productFk = _context.products.FirstOrDefault(c => c.ProductID == promotion.ProductID);
+            thePromotion.shopFk = _context.shops.FirstOrDefault(c => c.ShopID == promotion.ShopID);
 
 
             _context.promotion.Add(thePromotion);
             await _context.SaveChangesAsync();
 
-            return Ok();
+            return Ok(Responses.OkResponse("promotion", "add"));
         }
 
         //PromotionUpdate: has been commented!
@@ -140,14 +143,18 @@ namespace tenetApi.Controllers
         {
             if (!_context.promotion.Any(c => c.ProductID == promotion.ProductID))
             {
-                return NotFound();
+                return NotFound(Responses.NotFound("Promotion"));
             }
             var shopId = _context.shops.FirstOrDefault(c => c.ShopID == promotion.ShopID);
             var proId = _context.products.FirstOrDefault(c => c.ProductID == promotion.ProductID);
 
-            if (shopId == null || proId == null)
+            if (shopId == null)
             {
-                return BadRequest();
+                return BadRequest(Responses.BadResponde("shop", "invalid"));
+            }
+            if (proId == null)
+            {
+                return BadRequest(Responses.BadResponde("product", "invalid"));
             }
 
             Promotion promotionToUpdate = _context.promotion.FirstOrDefault(c => c.PromotionID == promotion.PromotionID);
@@ -168,7 +175,7 @@ namespace tenetApi.Controllers
 
             await _context.SaveChangesAsync();
 
-            return Ok();
+            return Ok(Responses.OkResponse("product", "mod"));
         }
 
         [HttpDelete]
@@ -178,7 +185,7 @@ namespace tenetApi.Controllers
 
             if (!_context.promotion.Any(c => c.PromotionID == promotionId))
             {
-                return NotFound();
+                return NotFound(Responses.NotFound("Promotion"));
             }
 
             Promotion productToDelete = _context.promotion.FirstOrDefault(c => c.PromotionID == promotionId);
@@ -187,7 +194,7 @@ namespace tenetApi.Controllers
 
             await _context.SaveChangesAsync();
 
-            return Ok();
+            return Ok(Responses.OkResponse("promotion", "del"));
         }
 
         [HttpPost]
@@ -197,7 +204,7 @@ namespace tenetApi.Controllers
 
             if (!_context.promotion.Any(c => c.PromotionID == promotionId))
             {
-                return NotFound();
+                return NotFound(Responses.NotFound("Promotion"));
             }
 
             Promotion productToDelete = _context.promotion.FirstOrDefault(c => c.PromotionID == promotionId);
@@ -206,7 +213,7 @@ namespace tenetApi.Controllers
 
             await _context.SaveChangesAsync();
 
-            return Ok();
+            return Ok(Responses.OkResponse("promotion", "undel"));
         }
 
         [HttpPost]
@@ -216,7 +223,7 @@ namespace tenetApi.Controllers
 
             if (!_context.promotion.Any(c => c.PromotionID == promotionId))
             {
-                return NotFound();
+                return NotFound(Responses.NotFound("Promotion"));
             }
 
             Promotion productToDelete = _context.promotion.FirstOrDefault(c => c.PromotionID == promotionId);
@@ -225,7 +232,7 @@ namespace tenetApi.Controllers
 
             await _context.SaveChangesAsync();
 
-            return Ok();
+            return Ok(Responses.OkResponse("promotion", "act"));
         }
 
         [HttpDelete]
@@ -235,7 +242,7 @@ namespace tenetApi.Controllers
 
             if (!_context.promotion.Any(c => c.PromotionID == promotionId))
             {
-                return NotFound();
+                return NotFound(Responses.NotFound("Promotion"));
             }
 
             Promotion productToDelete = _context.promotion.FirstOrDefault(c => c.PromotionID == promotionId);
@@ -244,7 +251,7 @@ namespace tenetApi.Controllers
 
             await _context.SaveChangesAsync();
 
-            return Ok();
+            return Ok(Responses.OkResponse("promotion", "inact"));
         }
     }
 }

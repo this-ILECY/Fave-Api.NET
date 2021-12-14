@@ -52,12 +52,16 @@ namespace tenet.Api
                       IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["Jwt:Key"]))
                   };
               });
-
+            services.AddAuthorization(options =>
+            {
+                options.AddPolicy("Shop", policy => policy.RequireRole("Shop"));
+            });
 
             services.AddControllers();
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "tenet.Api.1.0.0", Version = "v1" });
+                
             });
         }
 

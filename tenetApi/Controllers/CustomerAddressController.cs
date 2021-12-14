@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using tenetApi.Context;
+using tenetApi.Exception;
 using tenetApi.Model;
 using tenetApi.ViewModel;
 
@@ -14,7 +15,6 @@ namespace tenetApi.Controllers
     public class CustomerAddressController : ControllerBase
     {
         private readonly AppDbContext _context;
-        private IEnumerable<CustomerAddressViewModel> _customerAddressViewModel { get; set; }
         public CustomerAddressController(AppDbContext context)
         {
             _context = context;
@@ -24,7 +24,8 @@ namespace tenetApi.Controllers
         [Route("AddressByCustomerID")] 
         public async Task<ActionResult<IEnumerable<CustomerAddressViewModel>>> GetAddressByCustomerID(long CustomerID)
         {
-            _customerAddressViewModel = _context.customerAddresses.Select(c => new CustomerAddressViewModel()
+            IEnumerable<CustomerAddressViewModel> _customerAddressViewModelByCustomerID;
+            _customerAddressViewModelByCustomerID = _context.customerAddresses.Select(c => new CustomerAddressViewModel()
             {
                 AddressTitle = c.AddressTitle.Replace("_", " "),//change form (ex: "my_new_address" to "my new address")
                 CustomerAddressID = c.CustomerAddressID,
@@ -35,12 +36,12 @@ namespace tenetApi.Controllers
                 IsDeleted = c.IsDeleted
             }).ToList().Where(c=> c.CustomerID == CustomerID);
 
-            if (_customerAddressViewModel == null)
+            if (_customerAddressViewModelByCustomerID == null)
             {
-                return NotFound();
+                return NotFound(Responses.NotFound("customer address"));
             }
             
-            return _customerAddressViewModel.ToList();
+            return _customerAddressViewModelByCustomerID.ToList();
         }
 
         [HttpPost]
@@ -57,7 +58,7 @@ namespace tenetApi.Controllers
 
             if (custId == null)
             {
-                return BadRequest();
+                return BadRequest(Responses.BadResponde("customer", "invalid"));
             }
 
             CustomerAddress theCustomerAddress = new CustomerAddress();
@@ -71,7 +72,7 @@ namespace tenetApi.Controllers
             _context.customerAddresses.Add(theCustomerAddress);
             await _context.SaveChangesAsync();
 
-            return Ok();
+            return Ok(Responses.OkResponse("customer address", "add"));
         }
 
         [HttpPut]
@@ -82,7 +83,7 @@ namespace tenetApi.Controllers
 
             if (custId == null)
             {
-                return BadRequest("Customer not found!");
+                return BadRequest(Responses.BadResponde("customer", "invalid"));
             }
             if (customerAddress.AddressTitle.Contains(" "))//change space to underline
             {
@@ -95,33 +96,39 @@ namespace tenetApi.Controllers
 
             await _context.SaveChangesAsync();
 
-            return Ok();
+            return Ok(Responses.OkResponse("customer address", "mod"));
         }
         
         [HttpDelete]
         [Route("CustomerAddressDelete")]
         public async Task<ActionResult<CustomerViewModel>> DeleteCustomer(long customerAddressID)
         {
-
+            if (!_context.customerAddresses.Any(c => c.CustomerAddressID == customerAddressID))
+            {
+                return NotFound(Responses.NotFound("customer address"));
+            }
             CustomerAddress theCustomerAddress = _context.customerAddresses.FirstOrDefault(c => c.CustomerAddressID == customerAddressID);
             theCustomerAddress.IsDeleted = true;
 
             await _context.SaveChangesAsync();
 
-            return Ok();
+            return Ok(Responses.OkResponse("customer address","del"));
         }
         
         [HttpPost]
         [Route("CustomerAddressUndoDelete")]
         public async Task<ActionResult<CustomerViewModel>> UndoDeleteCustomer(long customerAddressID)
         {
-
+            if (!_context.customerAddresses.Any(c => c.CustomerAddressID == customerAddressID))
+            {
+                return NotFound(Responses.NotFound("customer address"));
+            }
             CustomerAddress theCustomerAddress = _context.customerAddresses.FirstOrDefault(c => c.CustomerAddressID == customerAddressID);
             theCustomerAddress.IsDeleted = false;
 
             await _context.SaveChangesAsync();
 
-            return Ok();
+            return Ok(Responses.OkResponse("customer address","undel"));
         }
     }
 }

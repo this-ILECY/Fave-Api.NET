@@ -1,20 +1,22 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using tenetApi.Context;
+using tenetApi.Exception;
 using tenetApi.Model;
 using tenetApi.ViewModel;
 
 namespace tenetApi.Controllers
 {
+
     [Route("api/[controller]")]
     [ApiController]
     public class CustomerController : ControllerBase
     {
         private readonly AppDbContext _context;
-        private IEnumerable<CustomerViewModel> _customerViewModel;
         public CustomerController(AppDbContext context)
         {
             _context = context;
@@ -23,7 +25,8 @@ namespace tenetApi.Controllers
         [Route("CustomerByID")]
         public async Task<ActionResult<IEnumerable<CustomerViewModel>>> GetCustomerByID(long CustomerID)
         {
-            _customerViewModel = _context.customers.Select(c => new CustomerViewModel()
+            IEnumerable<CustomerViewModel> _customerViewModelByID;
+            _customerViewModelByID = _context.customers.Select(c => new CustomerViewModel()
             {
                 CellPhone = c.CellPhone,
                 CustomerFirstName = c.CustomerFirstName.Replace("_"," "),
@@ -34,19 +37,20 @@ namespace tenetApi.Controllers
                 UserID = c.UserID
             }).ToList().Where(c => c.CustomerID == CustomerID);
 
-            if (_customerViewModel == null)
+            if (_customerViewModelByID == null)
             {
-                return NotFound();
+                return NotFound(Responses.NotFound("customer"));
             }
 
-            return _customerViewModel.ToList();
+            return _customerViewModelByID.ToList();
 
         }
         [HttpGet]
         [Route("CustomerByName")]
         public async Task<ActionResult<IEnumerable<CustomerViewModel>>> GetCustomerByName(string CustomerName)
         {
-            _customerViewModel = _context.customers.Select(c => new CustomerViewModel()
+            IEnumerable<CustomerViewModel> _customerViewModelByName;
+            _customerViewModelByName = _context.customers.Select(c => new CustomerViewModel()
             {
                 CellPhone = c.CellPhone,
                 CustomerFirstName = c.CustomerFirstName,
@@ -57,18 +61,19 @@ namespace tenetApi.Controllers
                 UserID = c.UserID
             }).ToList().Where(c => (c.CustomerFirstName + " " + c.CustomerLastName).Contains(CustomerName.ToLower()));//search through firstname and lastname together!
 
-            if (_customerViewModel == null)
+            if (_customerViewModelByName == null)
             {
-                return NotFound();
+                return NotFound(Responses.NotFound("customer"));
             }
-            return _customerViewModel.ToList();
+            return _customerViewModelByName.ToList();
         }
 
         [HttpGet]
         [Route("CustomerByEmail")]
         public async Task<ActionResult<IEnumerable<CustomerViewModel>>> GetCustomerByEmail(string CustomerEmail)
         {
-            _customerViewModel = _context.customers.Select(c => new CustomerViewModel()
+            IEnumerable<CustomerViewModel> _customerViewModelByEmail;
+            _customerViewModelByEmail = _context.customers.Select(c => new CustomerViewModel()
             {
                 CellPhone = c.CellPhone,
                 CustomerFirstName = c.CustomerFirstName,
@@ -79,22 +84,23 @@ namespace tenetApi.Controllers
                 UserID = c.UserID
             }).ToList().Where(c => c.Email.Contains(CustomerEmail.ToLower()));
 
-            if (_customerViewModel == null)
+            if (_customerViewModelByEmail == null)
             {
-                return NotFound();
+                return NotFound(Responses.NotFound("customer"));
             }
-            return _customerViewModel.ToList();
+            return _customerViewModelByEmail.ToList();
         }
 
         [HttpGet]
         [Route("CustomerByTelephone")]
         public async Task<ActionResult<IEnumerable<CustomerViewModel>>> GetCustomerByTelephone(string CustomerTelephone)
         {
+            IEnumerable<CustomerViewModel> _customerViewModelByTelephone;
             if (CustomerTelephone.StartsWith("0"))//telephone is "long" and does
             {
                 CustomerTelephone = CustomerTelephone.Remove(0, 1);
             }
-            _customerViewModel = _context.customers.Select(c => new CustomerViewModel()
+            _customerViewModelByTelephone = _context.customers.Select(c => new CustomerViewModel()
             {
                 CellPhone = c.CellPhone,
                 CustomerFirstName = c.CustomerFirstName,
@@ -105,22 +111,23 @@ namespace tenetApi.Controllers
                 UserID = c.UserID
             }).ToList().Where(c => c.Telephone.ToString().Contains(CustomerTelephone));
 
-            if (_customerViewModel == null)
+            if (_customerViewModelByTelephone == null)
             {
-                return NotFound();
+                return NotFound(Responses.NotFound("customer"));
             }
-            return _customerViewModel.ToList();
+            return _customerViewModelByTelephone.ToList();
         }
 
         [HttpGet]
         [Route("CustomerByCellphone")]
         public async Task<ActionResult<IEnumerable<CustomerViewModel>>> GetCustomerByCellphone(string CustomerCellphone)
         {
+            IEnumerable<CustomerViewModel> _customerViewModelByCellphone;
             if (CustomerCellphone.StartsWith("0"))
             {
                 CustomerCellphone = CustomerCellphone.Remove(0, 1);
             }
-            _customerViewModel = _context.customers.Select(c => new CustomerViewModel()
+            _customerViewModelByCellphone = _context.customers.Select(c => new CustomerViewModel()
             {
                 CellPhone = c.CellPhone,
                 CustomerFirstName = c.CustomerFirstName,
@@ -131,15 +138,16 @@ namespace tenetApi.Controllers
                 UserID = c.UserID
             }).ToList().Where(c => c.CellPhone.ToString().Contains(CustomerCellphone));
 
-            if (_customerViewModel == null)
+            if (_customerViewModelByCellphone == null)
             {
-                return NotFound();
+                return NotFound(Responses.NotFound("customer"));
             }
-            return _customerViewModel.ToList();
+            return _customerViewModelByCellphone.ToList();
         }
         
         [HttpPost]
         [Route("CustomerAdd")]
+        [Authorize(Roles = "Customer", AuthenticationSchemes = "Bearer")]
         public async Task<ActionResult<CustomerViewModel>> AddCustomer([FromBody] CustomerViewModel customer)
         {
             if (customer.CustomerFirstName.Contains(" ") || customer.CustomerLastName.Contains(" "))
@@ -147,15 +155,11 @@ namespace tenetApi.Controllers
                 customer.CustomerFirstName = customer.CustomerFirstName.Replace(" ", "_").ToLower();
                 customer.CustomerLastName = customer.CustomerLastName.Replace(" ", "_").ToLower();
             }
-            if (_context.customers.Any(c => (c.CustomerFirstName + " " + c.CustomerLastName) == (customer.CustomerFirstName + " " + customer.CustomerLastName)))
-            {
-                return BadRequest();
-            }
             var userId = _context.Users.FirstOrDefault(c => c.Id == customer.UserID);
 
             if (userId == null)
             {
-                return BadRequest("Invalid user!");
+                return BadRequest(Responses.BadResponde("user", "invalid"));
             }
 
             Customer theCustomer = new Customer();
@@ -170,7 +174,7 @@ namespace tenetApi.Controllers
             _context.customers.Add(theCustomer);
             await _context.SaveChangesAsync();
 
-            return Ok();
+            return Ok(Responses.OkResponse("customer", "add"));
         }
         
         [HttpPut]
@@ -184,7 +188,7 @@ namespace tenetApi.Controllers
             }
             if (!_context.customers.Any(c => c.CustomerID == customer.CustomerID))
             {
-                return NotFound();
+                return NotFound(Responses.NotFound("customer"));
             }
 
             Customer theCustomer = _context.customers.FirstOrDefault(c=> c.CustomerID == customer.CustomerID);
@@ -197,7 +201,7 @@ namespace tenetApi.Controllers
 
             await _context.SaveChangesAsync();
 
-            return Ok();
+            return Ok(Responses.OkResponse("customer", "mod"));
         }
         
         [HttpDelete]
@@ -206,7 +210,7 @@ namespace tenetApi.Controllers
         {
             if (!_context.customers.Any(c => c.CustomerID == customerID))
             {
-                return NotFound();
+                return NotFound(Responses.NotFound("customer"));
             }
 
             Customer theCustomer = _context.customers.FirstOrDefault(c => c.CustomerID == customerID);
@@ -214,7 +218,7 @@ namespace tenetApi.Controllers
 
             await _context.SaveChangesAsync();
 
-            return Ok();
+            return Ok(Responses.OkResponse("customer", "del"));
         }
         
         [HttpPost]
@@ -223,7 +227,7 @@ namespace tenetApi.Controllers
         {
             if (!_context.customers.Any(c => c.CustomerID == customerID))
             {
-                return NotFound();
+                return NotFound(Responses.NotFound("customer"));
             }
 
             Customer theCustomer = _context.customers.FirstOrDefault(c => c.CustomerID == customerID);
@@ -231,7 +235,7 @@ namespace tenetApi.Controllers
 
             await _context.SaveChangesAsync();
 
-            return Ok();
+            return Ok(Responses.OkResponse("customer", "undel"));
         }
         
         [HttpPost]
@@ -240,7 +244,7 @@ namespace tenetApi.Controllers
         {
             if (!_context.customers.Any(c => c.CustomerID == customerID))
             {
-                return NotFound();
+                return NotFound(Responses.NotFound("customer"));
             }
 
             Customer theCustomer = _context.customers.FirstOrDefault(c => c.CustomerID == customerID);
@@ -248,7 +252,7 @@ namespace tenetApi.Controllers
 
             await _context.SaveChangesAsync();
 
-            return Ok();
+            return Ok(Responses.OkResponse("customer", "act"));
         }
         
         [HttpDelete]
@@ -257,7 +261,7 @@ namespace tenetApi.Controllers
         {
             if (!_context.customers.Any(c => c.CustomerID == customerID))
             {
-                return NotFound();
+                return NotFound(Responses.NotFound("customer"));
             }
 
             Customer theCustomer = _context.customers.FirstOrDefault(c => c.CustomerID == customerID);
@@ -265,7 +269,7 @@ namespace tenetApi.Controllers
 
             await _context.SaveChangesAsync();
 
-            return Ok();
+            return Ok(Responses.OkResponse("customer", "inact"));
         }
     }
 }

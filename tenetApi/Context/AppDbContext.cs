@@ -28,6 +28,14 @@ namespace tenetApi.Context
             builder.Entity<Product>().HasOne(b => b.shopFk).WithMany(c => c.productFk).HasForeignKey("ShopID").OnDelete(DeleteBehavior.Restrict);
             builder.Entity<Product>().HasMany(b => b.promotionFk).WithOne(c => c.productFk).HasForeignKey("ProductID").OnDelete(DeleteBehavior.Restrict);
             builder.Entity<ShopCategory>().HasMany(b => b.shopFk).WithOne(c => c.shopCategoryFk).HasForeignKey("ShopCategoryID").OnDelete(DeleteBehavior.Restrict);
+            builder.Entity<Customer>().HasQueryFilter(p => p.IsDeleted == false);
+            builder.Entity<CustomerAddress>().HasQueryFilter(p => p.IsDeleted == false);
+            builder.Entity<Product>().HasQueryFilter(p => p.IsDeleted == false);
+            builder.Entity<ProductCategory>().HasQueryFilter(p => p.IsDeleted == false);
+            builder.Entity<Promotion>().HasQueryFilter(p => p.IsDeleted == false);
+            builder.Entity<User>().HasQueryFilter(p => p.IsDeleted == false);
+            builder.Entity<Shop>().HasQueryFilter(p => p.IsDeleted == false);
+            builder.Entity<ShopCategory>().HasQueryFilter(p => p.IsDeleted == false);
         }
     }
 }
