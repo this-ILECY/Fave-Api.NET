@@ -13,8 +13,8 @@ namespace tenetApi.Model
         public string CustomerFirstName { get; set; }
         [MaxLength(30)]
         public string CustomerLastName { get; set; }
-        public int Telephone { get; set; }
-        public int CellPhone { get; set; }
+        public string Telephone { get; set; }
+        public string CellPhone { get; set; }
         [MaxLength(50)]
         public string Email { get; set; }
         public bool IsActive{ get; set; }

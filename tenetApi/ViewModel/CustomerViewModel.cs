@@ -6,8 +6,8 @@
         public long UserID { get; set; }
         public string CustomerFirstName { get; set; }
         public string CustomerLastName { get; set; }
-        public int Telephone { get; set; }
-        public int CellPhone { get; set; }
+        public string Telephone { get; set; }
+        public string CellPhone { get; set; }
         public string Email { get; set; }
     }
 }

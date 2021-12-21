@@ -13,8 +13,8 @@ namespace tenetApi.Model
         public string ShopName { get; set; }
         [MaxLength(300)]
         public string ShopAddress { get; set; }
-        public int TelePhone { get; set; }
-        public int CellPhone { get; set; }
+        public string TelePhone { get; set; }
+        public string CellPhone { get; set; }
         public decimal ShopLatitude { get; set; }
         public decimal ShopLongitude { get; set; }
         public bool IsActive { get; set; }

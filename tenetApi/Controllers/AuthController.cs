@@ -96,7 +96,7 @@ namespace tenetApi.Controllers
             }
             var role = await roleManager.RoleExistsAsync(login.Role);
             var emailformat = Regex.IsMatch(login.UserName, @"^[^@\s]+@[^@\s]+\.[^@\s]+$");
-            var phoneformat = Regex.IsMatch(login.UserName, @"^\d");
+            var phoneformat = Regex.IsMatch(login.UserName, @"^[1-9]\d{11}$");
             User user = new User();
             if (emailformat)
             {
@@ -111,9 +111,10 @@ namespace tenetApi.Controllers
                 user = await userManager.FindByNameAsync(login.UserName);
 
             }
+            
+            var xx = await userManager.CheckPasswordAsync(user, login.UserPassword);
 
-
-            if (user == null || await userManager.CheckPasswordAsync(user, login.UserPassword))
+            if (user == null || !xx)
             {
                 return BadRequest(Responses.BadResponde("login credentials", "invalid"));
             }
