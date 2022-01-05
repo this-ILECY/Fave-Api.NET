@@ -19,6 +19,50 @@ namespace tenetApi.Controllers
         {
             _context = context;
         }
+
+
+        [HttpPost]
+        [Route("getimg")]
+        public async Task<ActionResult<Shop>> Getimg([FromHeader]string img)
+        {
+            Shop _shop;
+
+            string Shop = img;
+            
+
+            return Ok();
+
+        }
+
+
+        [HttpGet]
+        [Route("PromotionAll")]
+        public async Task<ActionResult<IEnumerable<PromotionViewModel>>> GetpromotionsAll()
+        {
+            IEnumerable<PromotionViewModel> _promotionViewModelByID;
+            _promotionViewModelByID = _context.promotion.Select(c => new PromotionViewModel()
+            {
+                PromotionID = c.PromotionID,
+                ProductID = c.ProductID,
+                ShopID = c.ShopID,
+                QualityGrade = c.QualityGrade,
+                BasePrice = c.BasePrice,
+                DiscountPrice = c.DiscountPrice,
+                EndDate = c.EndDate,
+                EndTime = c.EndTime,
+                Stock = c.Stock,
+                IsActive = c.IsActive,
+                IsDeleted = c.IsDeleted
+            }).ToList();
+
+            if (_promotionViewModelByID == null)
+            {
+                return NotFound(Responses.NotFound("Promotion"));
+            }
+
+            return Ok(_promotionViewModelByID.ToList());
+
+        }
         [HttpGet]
         [Route("PromotionByID")]
         public async Task<ActionResult<IEnumerable<PromotionViewModel>>> GetpromotionsByID(long PromotionID)

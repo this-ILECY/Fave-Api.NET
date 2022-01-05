@@ -37,7 +37,15 @@ namespace tenet.Api
             services.AddIdentity<User, Role>()
                      .AddEntityFrameworkStores<AppDbContext>().AddDefaultTokenProviders();
 
-
+            services.AddCors(options =>
+            {
+                options.AddPolicy("localHostTest", builder =>
+                {
+                    builder.WithOrigins("*")
+                    .AllowAnyHeader()
+                    .AllowAnyMethod();
+                });
+            });
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
               .AddJwtBearer(options =>
               {
@@ -75,6 +83,8 @@ namespace tenet.Api
                 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "tenet.Api.1.0.0 v1"));
             }
 
+            app.UseCors("localHostTest");
+             
             app.UseHttpsRedirection();
 
             app.UseRouting();
