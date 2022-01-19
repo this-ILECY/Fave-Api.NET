@@ -24,35 +24,36 @@ namespace tenetApi.Controllers
 
 
         
+        //promotions all
+        //[HttpGet]
+        //[Route("PromotionAll")]
+        //public async Task<ActionResult<IEnumerable<PromotionViewModel>>> GetpromotionsAll()
+        //{
+        //    IEnumerable<PromotionViewModel> _promotionViewModelByID;
+        //    _promotionViewModelByID = _context.promotion.Select(c => new PromotionViewModel()
+        //    {
+        //        PromotionID = c.PromotionID,
+        //        ProductID = c.ProductID,
+        //        ShopID = c.ShopID,
+        //        QualityGrade = c.QualityGrade,
+        //        BasePrice = c.BasePrice,
+        //        DiscountPrice = c.DiscountPrice,
+        //        EndDate = c.EndDate,
+        //        StartDate = c.StartDate,
+        //        Stock = c.Stock,
+        //        IsActive = c.IsActive,
+        //        IsDeleted = c.IsDeleted
+        //    }).ToList();
 
-        [HttpGet]
-        [Route("PromotionAll")]
-        public async Task<ActionResult<IEnumerable<PromotionViewModel>>> GetpromotionsAll()
-        {
-            IEnumerable<PromotionViewModel> _promotionViewModelByID;
-            _promotionViewModelByID = _context.promotion.Select(c => new PromotionViewModel()
-            {
-                PromotionID = c.PromotionID,
-                ProductID = c.ProductID,
-                ShopID = c.ShopID,
-                QualityGrade = c.QualityGrade,
-                BasePrice = c.BasePrice,
-                DiscountPrice = c.DiscountPrice,
-                EndDate = c.EndDate,
-                StartDate = c.StartDate,
-                Stock = c.Stock,
-                IsActive = c.IsActive,
-                IsDeleted = c.IsDeleted
-            }).ToList();
+        //    if (_promotionViewModelByID == null)
+        //    {
+        //        return NotFound(Responses.NotFound("Promotion"));
+        //    }
 
-            if (_promotionViewModelByID == null)
-            {
-                return NotFound(Responses.NotFound("Promotion"));
-            }
+        //    return Ok(_promotionViewModelByID.ToList());
 
-            return Ok(_promotionViewModelByID.ToList());
+        //}
 
-        }
         [HttpGet]
         [Route("PromotionByID")]
         public async Task<ActionResult<IEnumerable<PromotionViewModel>>> GetpromotionsByID(long PromotionID)
