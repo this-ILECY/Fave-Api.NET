@@ -89,11 +89,11 @@ namespace tenetApi.Controllers
             var catId = _context.productCategories.FirstOrDefault(c => c.ProductCategoryID == product.ProductCategoryID);
             if (catId == null)
             {
-                return BadRequest(Responses.BadResponde("product category", "invalid"));
+                return BadRequest(Responses.BadResponse("product category", "invalid"));
             }
             if (shopId == null)
             {
-                return BadRequest(Responses.BadResponde("shop", "invalid"));
+                return BadRequest(Responses.BadResponse("shop", "invalid"));
             }
             Product theProduct = new Product();
             theProduct.ProductTitle = product.ProductTitle;
@@ -128,11 +128,11 @@ namespace tenetApi.Controllers
 
             if (catId == null)
             {
-                return BadRequest(Responses.BadResponde("product category", "invalid"));
+                return BadRequest(Responses.BadResponse("product category", "invalid"));
             }
             if (shopId == null)
             {
-                return BadRequest(Responses.BadResponde("shop", "invalid"));
+                return BadRequest(Responses.BadResponse("shop", "invalid"));
             }
             Product productToUpdate = _context.products.FirstOrDefault(c => c.ProductID == product.ProductID);
             productToUpdate.ProductTitle = product.ProductTitle;

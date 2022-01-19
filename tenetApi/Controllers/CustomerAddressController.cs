@@ -58,7 +58,7 @@ namespace tenetApi.Controllers
 
             if (custId == null)
             {
-                return BadRequest(Responses.BadResponde("customer", "invalid"));
+                return BadRequest(Responses.BadResponse("customer", "invalid"));
             }
 
             CustomerAddress theCustomerAddress = new CustomerAddress();
@@ -83,7 +83,7 @@ namespace tenetApi.Controllers
 
             if (custId == null)
             {
-                return BadRequest(Responses.BadResponde("customer", "invalid"));
+                return BadRequest(Responses.BadResponse("customer", "invalid"));
             }
             if (customerAddress.AddressTitle.Contains(" "))//change space to underline
             {

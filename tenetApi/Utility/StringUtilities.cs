@@ -1,15 +1,18 @@
 ﻿namespace tenetApi.Utility
 {
-    public class StringUtilities
+    public static class StringUtilities
     {
-        public string spaceRemover(string text)
+        public static string spaceRemover(string text)
         {
             return string.Empty;
         }
 
-        public string lowerCaser()
+        public static string lowerCaser()
         {
             return "ok";
         }
+
+        public static string ShopAvatarAddress = "C:\\Users\\Mardani.AmirHosein\\source\\repos\\tenet\\tenetApi\\tenetApi\\tenetApi\\img\\avatar\\shop\\";
+        public static string ShopBannerAddress = "C:\\Users\\Mardani.AmirHosein\\source\\repos\\tenet\\tenetApi\\tenetApi\\tenetApi\\img\\banner\\shop\\";
     }
 }

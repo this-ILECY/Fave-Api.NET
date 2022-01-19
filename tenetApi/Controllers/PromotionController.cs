@@ -2,11 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using tenetApi.Context;
 using tenetApi.Exception;
 using tenetApi.Model;
 using tenetApi.ViewModel;
+using System.IO;
 
 namespace tenetApi.Controllers
 {
@@ -21,19 +23,7 @@ namespace tenetApi.Controllers
         }
 
 
-        [HttpPost]
-        [Route("getimg")]
-        public async Task<ActionResult<Shop>> Getimg([FromHeader]string img)
-        {
-            Shop _shop;
-
-            string Shop = img;
-            
-
-            return Ok();
-
-        }
-
+        
 
         [HttpGet]
         [Route("PromotionAll")]
@@ -152,11 +142,11 @@ namespace tenetApi.Controllers
         {
             if (_context.promotion.Any(c => c.ProductID == promotion.ProductID && c.IsActive == true))
             {
-                return BadRequest(Responses.BadResponde("promotion", "duplicate"));
+                return BadRequest(Responses.BadResponse("promotion", "duplicate"));
             }
             if (!_context.shops.Any(c => c.ShopID == promotion.ShopID))
             {
-                return BadRequest(Responses.BadResponde("shop", "invalid"));
+                return BadRequest(Responses.BadResponse("shop", "invalid"));
             }
             Promotion thePromotion = new Promotion();
             thePromotion.ProductID = promotion.ProductID;
@@ -194,11 +184,11 @@ namespace tenetApi.Controllers
 
             if (shopId == null)
             {
-                return BadRequest(Responses.BadResponde("shop", "invalid"));
+                return BadRequest(Responses.BadResponse("shop", "invalid"));
             }
             if (proId == null)
             {
-                return BadRequest(Responses.BadResponde("product", "invalid"));
+                return BadRequest(Responses.BadResponse("product", "invalid"));
             }
 
             Promotion promotionToUpdate = _context.promotion.FirstOrDefault(c => c.PromotionID == promotion.PromotionID);
@@ -297,5 +287,12 @@ namespace tenetApi.Controllers
 
             return Ok(Responses.OkResponse("promotion", "inact"));
         }
+    }
+
+
+    public class imageViewModel
+    {
+        public IFormFile img { get; set; }
+
     }
 }

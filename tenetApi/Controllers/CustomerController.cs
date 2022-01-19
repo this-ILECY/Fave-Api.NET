@@ -159,7 +159,7 @@ namespace tenetApi.Controllers
 
             if (userId == null)
             {
-                return BadRequest(Responses.BadResponde("user", "invalid"));
+                return BadRequest(Responses.BadResponse("user", "invalid"));
             }
 
             Customer theCustomer = new Customer();

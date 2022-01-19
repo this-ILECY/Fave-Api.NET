@@ -47,11 +47,11 @@ namespace tenetApi.Controllers
             var userEmailExists = await userManager.FindByNameAsync(login.Email);
             var userPhoneExists = await userManager.FindByNameAsync(login.Phone);
             if (userNameExists != null)
-                return BadRequest(Responses.BadResponde("user", "duplicate"));
+                return BadRequest(Responses.BadResponse("user", "duplicate"));
             if (userEmailExists != null)
-                return BadRequest(Responses.BadResponde("email", "duplicate"));
+                return BadRequest(Responses.BadResponse("email", "duplicate"));
             if (userPhoneExists != null)
-                return BadRequest(Responses.BadResponde("phone", "duplicate"));
+                return BadRequest(Responses.BadResponse("phone", "duplicate"));
 
 
             User user = new User()
@@ -68,13 +68,13 @@ namespace tenetApi.Controllers
                 var role = await userManager.AddToRoleAsync(user, login.Role);
                 if (!role.Succeeded == true)
                 {
-                    return BadRequest(Responses.BadResponde("user", "invalid") + " " + result);
+                    return BadRequest(Responses.BadResponse("user", "invalid") + " " + result);
                 }
                 return Ok(Responses.OkResponse("login", "add"));
             }
             else
             {
-                return BadRequest(Responses.BadResponde("user", "invalid") + " " + result);
+                return BadRequest(Responses.BadResponse("user", "invalid") + " " + result);
             }
 
 
@@ -116,7 +116,7 @@ namespace tenetApi.Controllers
 
             if (user == null || !xx)
             {
-                return BadRequest(Responses.BadResponde("login credentials", "invalid"));
+                return BadRequest(Responses.BadResponse("login credentials", "invalid"));
             }
             else
             {

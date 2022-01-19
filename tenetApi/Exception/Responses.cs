@@ -41,7 +41,7 @@
             }
 
         }
-        public static string BadResponde(string controllerName, string reason)
+        public static string BadResponse(string controllerName, string reason)
         {
             switch (reason)
             {
@@ -52,6 +52,18 @@
                 case "duplicate":
                     {
                         return $"already a {controllerName} found!";
+                    }
+                case "extension":
+                    {
+                        return $"Invalid extension!";
+                    }
+                case "userType":
+                    {
+                        return $"Invalid user type!";
+                    }
+                case "heavy":
+                    {
+                        return $"heavy file found!";
                     }
                 default:
                     {

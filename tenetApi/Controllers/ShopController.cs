@@ -3,18 +3,20 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using tenetApi.Context;
 using tenetApi.Exception;
 using tenetApi.Model;
+using tenetApi.Utility;
 using tenetApi.ViewModel;
 
 namespace tenetApi.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize(Policy ="Shop", AuthenticationSchemes = "Bearer")]
+    //[Authorize(Policy ="Shop", AuthenticationSchemes = "Bearer")]
     public class ShopController : ControllerBase
     {
         private readonly AppDbContext _context;
@@ -23,6 +25,7 @@ namespace tenetApi.Controllers
         {
             _context = context;
         }
+
 
         [HttpGet]
         [Route("ShopByID")]
@@ -34,10 +37,12 @@ namespace tenetApi.Controllers
                 ShopID = c.ShopID,
                 UserID = c.UserID,
                 ShopCategoryID = c.ShopCategoryID,
-                ShopName = c.ShopName,
+                ShopName = c.ShopName.Replace("_", " "),
                 ShopAddress = c.ShopAddress,
                 TelePhone = c.TelePhone,
                 CellPhone = c.CellPhone,
+                ShopBanner = StringUtilities.ShopBannerAddress + c.ShopBanner,
+                ShopAvatar = StringUtilities.ShopAvatarAddress + c.ShopAvatar,
                 ShopLatitude = c.ShopLatitude,
                 ShopLongitude = c.ShopLongitude,
                 IsActive = c.IsActive,
@@ -125,7 +130,7 @@ namespace tenetApi.Controllers
         [Route("AddShop")]
         public async Task<ActionResult<ShopViewModel>> AddShop([FromBody] ShopViewModel shop)
         {
-            
+
             shop.ShopName = shop.ShopName.ToLower();
             if (shop.ShopName.Contains(" "))
             {
@@ -133,15 +138,15 @@ namespace tenetApi.Controllers
             }
             if (_context.shops.Any(c => c.ShopName == shop.ShopName))
             {
-                return BadRequest(Responses.BadResponde("Shop", "invalid"));
+                return BadRequest(Responses.BadResponse("Shop", "invalid"));
             }
             if (_context.shops.Any(c => c.UserID == shop.UserID))
             {
-                return BadRequest(Responses.BadResponde("User", "invalid"));
+                return BadRequest(Responses.BadResponse("User", "invalid"));
             }
             if (!_context.shops.Any(c => c.ShopCategoryID == shop.ShopCategoryID))
             {
-                return BadRequest(Responses.BadResponde("Shop Category", "invalid"));
+                return BadRequest(Responses.BadResponse("Shop Category", "invalid"));
             }
 
             Shop theShop = new Shop()
@@ -177,21 +182,54 @@ namespace tenetApi.Controllers
             {
                 shop.ShopName = shop.ShopName.Replace(" ", "_");
             }
-            if (!_context.shops.Any(c => c.ShopName == shop.ShopName))
-            {
-                return BadRequest(Responses.BadResponde("Shop", "invalid"));
-            }
             if (!_context.shops.Any(c => c.UserID == shop.UserID))
             {
-                return BadRequest(Responses.BadResponde("User", "invalid"));
+                return BadRequest(Responses.BadResponse("User", "invalid"));
             }
             if (!_context.shops.Any(c => c.ShopCategoryID == shop.ShopCategoryID))
             {
-                return BadRequest(Responses.BadResponde("Shop category", "invalid"));
+                return BadRequest(Responses.BadResponse("Shop category", "invalid"));
             }
 
 
+
+            var avatarname = Path.GetFileName(shop.ShopAvatar);
+            var bannername = Path.GetFileName(shop.ShopBanner);
+
             Shop shopToUpdate = _context.shops.FirstOrDefault(c => c.ShopID == shop.ShopID);
+
+            if (shopToUpdate.ShopBanner != shop.ShopBanner)
+            {
+
+                try
+                {
+                    string oldFile = Path.Combine("..\\img\\banner\\shop\\", shopToUpdate.ShopBanner);
+                    Directory.Delete(oldFile);
+                }
+                catch (System.Exception)
+                {
+
+                    return BadRequest(Responses.BadResponse("Shop category", "heavy"));
+                }
+
+
+            }
+            if (shopToUpdate.ShopAvatar != shop.ShopAvatar)
+            {
+
+                try
+                {
+                    string oldFile = StringUtilities.ShopAvatarAddress + shopToUpdate.ShopAvatar;
+                    Directory.Delete(oldFile);
+                }
+                catch (System.Exception)
+                {
+
+                    return BadRequest(Responses.BadResponse("Shop category", "heavy"));
+                }
+
+
+            }
 
             shopToUpdate.IsActive = shop.IsActive;
             shopToUpdate.ShopName = shop.ShopName;
@@ -202,6 +240,8 @@ namespace tenetApi.Controllers
             shopToUpdate.ShopAddress = shop.ShopAddress;
             shopToUpdate.ShopLatitude = shop.ShopLatitude;
             shopToUpdate.ShopLongitude = shop.ShopLongitude;
+            shopToUpdate.ShopAvatar = avatarname;
+            shopToUpdate.ShopBanner = bannername;
             shopToUpdate.TelePhone = shop.TelePhone;
             shopToUpdate.UserID = shop.UserID;
             shopToUpdate.shopCategoryFk = _context.shopCategories.FirstOrDefault(c => c.ShopCategoryID == shop.ShopCategoryID);
