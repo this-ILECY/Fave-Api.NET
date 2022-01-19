@@ -15,8 +15,7 @@ namespace tenetApi.Model
         public int Stock { get; set; }
         public int QualityGrade { get; set; }
         public DateTime EndDate { get; set; }
-        [MaxLength(30)]
-        public string EndTime { get; set; }
+        public DateTime StartDate { get; set; }
         public bool IsActive{ get; set; }
 
         public Product productFk { get; set; }

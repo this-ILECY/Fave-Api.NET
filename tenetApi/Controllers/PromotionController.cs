@@ -39,7 +39,7 @@ namespace tenetApi.Controllers
                 BasePrice = c.BasePrice,
                 DiscountPrice = c.DiscountPrice,
                 EndDate = c.EndDate,
-                EndTime = c.EndTime,
+                StartDate = c.StartDate,
                 Stock = c.Stock,
                 IsActive = c.IsActive,
                 IsDeleted = c.IsDeleted
@@ -67,7 +67,7 @@ namespace tenetApi.Controllers
                 BasePrice = c.BasePrice,
                 DiscountPrice = c.DiscountPrice,
                 EndDate = c.EndDate,
-                EndTime = c.EndTime,
+                StartDate = c.StartDate,
                 Stock = c.Stock,
                 IsActive = c.IsActive,
                 IsDeleted = c.IsDeleted
@@ -96,7 +96,7 @@ namespace tenetApi.Controllers
                 BasePrice = c.BasePrice,
                 DiscountPrice = c.DiscountPrice,
                 EndDate = c.EndDate,
-                EndTime = c.EndTime,
+                StartDate = c.StartDate,
                 Stock = c.Stock,
                 IsActive = c.IsActive,
                 IsDeleted = c.IsDeleted
@@ -123,7 +123,7 @@ namespace tenetApi.Controllers
                 BasePrice = c.BasePrice,
                 DiscountPrice = c.DiscountPrice,
                 EndDate = c.EndDate,
-                EndTime = c.EndTime,
+                StartDate = c.StartDate,
                 Stock = c.Stock,
                 IsActive = c.IsActive,
                 IsDeleted = c.IsDeleted
@@ -140,7 +140,7 @@ namespace tenetApi.Controllers
         [Route("PromotionAdd")]
         public async Task<ActionResult<PromotionViewModel>> AddPromotion([FromBody] PromotionViewModel promotion)
         {
-            if (_context.promotion.Any(c => c.ProductID == promotion.ProductID && c.IsActive == true))
+            if (_context.promotion.Any(c => c.ProductID == promotion.ProductID && c.IsActive == true && c.ShopID == promotion.ShopID))
             {
                 return BadRequest(Responses.BadResponse("promotion", "duplicate"));
             }
@@ -155,7 +155,7 @@ namespace tenetApi.Controllers
             thePromotion.DiscountPrice = promotion.DiscountPrice;
             thePromotion.Stock = promotion.Stock;
             thePromotion.QualityGrade = promotion.QualityGrade;
-            thePromotion.EndTime = promotion.EndTime;
+            thePromotion.StartDate = promotion.StartDate;
             thePromotion.EndDate = promotion.EndDate;
             thePromotion.IsActive = promotion.IsActive;
             thePromotion.IsDeleted = promotion.IsDeleted;
@@ -170,7 +170,7 @@ namespace tenetApi.Controllers
             return Ok(Responses.OkResponse("promotion", "add"));
         }
 
-        //PromotionUpdate: has been commented!
+        //PromotionUpdate: was been commented!
         [HttpPut]
         [Route("PromotionUpdate")]
         public async Task<IActionResult> UpdateProduct([FromBody] PromotionViewModel promotion)
@@ -198,7 +198,7 @@ namespace tenetApi.Controllers
             promotionToUpdate.DiscountPrice = promotion.DiscountPrice;
             promotionToUpdate.Stock = promotion.Stock;
             promotionToUpdate.QualityGrade = promotion.QualityGrade;
-            promotionToUpdate.EndTime = promotion.EndTime;
+            promotionToUpdate.StartDate = promotion.StartDate;
             promotionToUpdate.EndDate = promotion.EndDate;
             promotionToUpdate.IsActive = promotion.IsActive;
             promotionToUpdate.IsDeleted = promotion.IsDeleted;
