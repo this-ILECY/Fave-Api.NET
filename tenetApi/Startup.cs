@@ -34,6 +34,17 @@ namespace tenet.Api
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddDbContext<AppDbContext>(opt => opt.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
+
+            services.Configure<IdentityOptions>(options=>
+            {
+                options.Password.RequireUppercase = false;
+                options.Password.RequireLowercase = false;
+                options.Password.RequireNonAlphanumeric = false;
+                options.Password.RequireUppercase = false;
+                options.Password.RequiredLength = 1;
+                options.Password.RequiredUniqueChars = 0;
+            });
+
             services.AddIdentity<User, Role>()
                      .AddEntityFrameworkStores<AppDbContext>().AddDefaultTokenProviders();
 

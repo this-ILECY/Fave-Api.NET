@@ -324,5 +324,12 @@ namespace tenetApi.Controllers
 
             return Ok(Responses.OkResponse("Shop", "act"));
         }
+
+        [HttpGet]
+        [Route("shopInvoiceChartData")]
+        public async Task<ActionResult<InvoiceChartViewModel>> ShopReportChartData([FromBody]InvoiceChartViewModel chartData)
+        {
+            return Ok();
+        }
     }
 }

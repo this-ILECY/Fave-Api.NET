@@ -41,7 +41,14 @@ namespace tenetApi.Controllers
             {
                 login.UserName = login.UserName.Replace(" ", "_").ToLower();
             }
-
+            if (login.Email == null)
+            {
+                login.Email = "";
+            }
+            if (login.Phone == null)
+            {
+                login.Phone = "";
+            }
 
             var userNameExists = await userManager.FindByNameAsync(login.UserName);
             var userEmailExists = await userManager.FindByNameAsync(login.Email);
@@ -111,7 +118,7 @@ namespace tenetApi.Controllers
                 user = await userManager.FindByNameAsync(login.UserName);
 
             }
-            
+
             var xx = await userManager.CheckPasswordAsync(user, login.UserPassword);
 
             if (user == null || !xx)
