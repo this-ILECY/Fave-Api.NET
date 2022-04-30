@@ -37,6 +37,7 @@ namespace tenet.Api
 
             services.Configure<IdentityOptions>(options=>
             {
+                options.Password.RequireDigit = false;
                 options.Password.RequireUppercase = false;
                 options.Password.RequireLowercase = false;
                 options.Password.RequireNonAlphanumeric = false;

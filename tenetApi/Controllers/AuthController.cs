@@ -33,22 +33,32 @@ namespace tenetApi.Controllers
         }
 
         [HttpPost]
+        [Route("UserCheck")]
+        public async Task<IActionResult> UserCheck([FromHeader]String username)
+        {
+            if (username.Contains(" "))
+                username = username.Replace(" ", "_").ToLower();
+
+
+            var UserExists = await userManager.FindByNameAsync(username);
+
+            if (UserExists != null)
+                return BadRequest(Responses.BadResponse("user", "duplicate"));
+            else
+                return Ok();
+        }
+
+        [HttpPost]
         [Route("Register")]
 
         public async Task<IActionResult> Register([FromBody] SignInUpModel login)
         {
             if (login.UserName.Contains(" "))
-            {
                 login.UserName = login.UserName.Replace(" ", "_").ToLower();
-            }
             if (login.Email == null)
-            {
                 login.Email = "";
-            }
             if (login.Phone == null)
-            {
                 login.Phone = "";
-            }
 
             var userNameExists = await userManager.FindByNameAsync(login.UserName);
             var userEmailExists = await userManager.FindByNameAsync(login.Email);
@@ -74,15 +84,12 @@ namespace tenetApi.Controllers
             {
                 var role = await userManager.AddToRoleAsync(user, login.Role);
                 if (!role.Succeeded == true)
-                {
                     return BadRequest(Responses.BadResponse("user", "invalid") + " " + result);
-                }
                 return Ok(Responses.OkResponse("login", "add"));
             }
             else
-            {
                 return BadRequest(Responses.BadResponse("user", "invalid") + " " + result);
-            }
+
 
 
 
