@@ -36,6 +36,8 @@ namespace tenetApi.Controllers
         [Route("UserCheck")]
         public async Task<IActionResult> UserCheck([FromHeader]String username)
         {
+            if (username == null)
+                username = " ";
             if (username.Contains(" "))
                 username = username.Replace(" ", "_").ToLower();
 
@@ -85,7 +87,10 @@ namespace tenetApi.Controllers
                 var role = await userManager.AddToRoleAsync(user, login.Role);
                 if (!role.Succeeded == true)
                     return BadRequest(Responses.BadResponse("user", "invalid") + " " + result);
-                return Ok(Responses.OkResponse("login", "add"));
+                var loginContent = await Login(login);
+
+                return Ok(loginContent);
+
             }
             else
                 return BadRequest(Responses.BadResponse("user", "invalid") + " " + result);
