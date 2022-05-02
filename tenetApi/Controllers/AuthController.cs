@@ -14,6 +14,8 @@ using tenetApi.Exception;
 using tenetApi.Model;
 using System.Net.Mail;
 using System.Text.RegularExpressions;
+using tenetApi.ViewModel;
+using tenetApi.Context;
 
 namespace tenetApi.Controllers
 {
@@ -21,12 +23,15 @@ namespace tenetApi.Controllers
     [ApiController]
     public class AuthController : ControllerBase
     {
+        private readonly AppDbContext _context;
         private readonly UserManager<User> userManager;
         private readonly RoleManager<Role> roleManager;
         private readonly IConfiguration _configuration;
 
-        public AuthController(UserManager<User> userManager, RoleManager<Role> roleManager, IConfiguration configuration)
+        public AuthController(UserManager<User> userManager, RoleManager<Role> roleManager, IConfiguration configuration,
+            AppDbContext context)
         {
+            _context = context;
             this.userManager = userManager;
             this.roleManager = roleManager;
             _configuration = configuration;
@@ -34,7 +39,7 @@ namespace tenetApi.Controllers
 
         [HttpPost]
         [Route("UserCheck")]
-        public async Task<IActionResult> UserCheck([FromHeader]String username)
+        public async Task<IActionResult> UserCheck([FromHeader] String username)
         {
             if (username == null)
                 username = " ";
@@ -161,10 +166,31 @@ namespace tenetApi.Controllers
 
                 signingCredentials: new SigningCredentials(authSigningKey, SecurityAlgorithms.HmacSha256)
                 );
+
+                ShopViewModel shopmodel = new ShopViewModel()
+                {
+                    ShopID = _context.shops.Max(c => c.ShopID),
+                    UserID = user.Id,
+                    ShopCategoryID = 1,
+                    ShopName = "",
+                    ShopAddress = "",
+                    TelePhone = "",
+                    CellPhone = "",
+                    ShopAvatar = "",
+                    ShopBanner = "",
+                    ShopLatitude = 0,
+                    ShopLongitude = 0,
+                    IsActive = true
+                };
+
+                ShopController shop = new ShopController(_context);
+                await shop.AddShop(shopmodel);
+
                 return Ok(new
                 {
                     token = new JwtSecurityTokenHandler().WriteToken(token),
-                    expiration = token.ValidTo
+                    expiration = token.ValidTo,
+                    user = user.UserName
                 });
             }
             return Unauthorized();

@@ -95,6 +95,40 @@ namespace tenetApi.Controllers
         }
 
         [HttpGet]
+        [Route("ShopByUserID")]
+        public async Task<ActionResult<ShopViewModel>> GetShopByUserID(string userID)
+        {
+            ShopViewModel _shopViewModelByName;
+
+            if (userID == null)
+                return NotFound(Responses.NotFound("Shop"));
+
+            _shopViewModelByName = _context.shops.Select(c => new ShopViewModel()
+            {
+                ShopID = c.ShopID,
+                UserID = c.UserID,
+                ShopCategoryID = c.ShopCategoryID,
+                ShopName = c.ShopName,
+                ShopAddress = c.ShopAddress,
+                TelePhone = c.TelePhone,
+                CellPhone = c.CellPhone,
+                ShopLatitude = c.ShopLatitude,
+                ShopLongitude = c.ShopLongitude,
+                IsActive = c.IsActive,
+                IsDeleted = c.IsDeleted,
+                CreatedDate = c.CreatedDate
+
+            }).ToList().FirstOrDefault(c => c.UserID.ToString() == userID);
+
+            if (_shopViewModelByName == null)
+            {
+                return NotFound(Responses.NotFound("Shop"));
+            }
+
+            return Ok(_shopViewModelByName);
+        }
+
+        [HttpGet]
         [Route("ShopByAddress")]
         public async Task<ActionResult<IEnumerable<ShopViewModel>>> GetShopByAddress(string ShopAddress)
         {
@@ -168,7 +202,18 @@ namespace tenetApi.Controllers
             };
 
             _context.shops.Add(theShop);
-            await _context.SaveChangesAsync();
+
+
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+
+            catch (System.Exception ex)
+            {
+
+            }
+
 
             return Ok(Responses.OkResponse("Shop", "add"));
         }
@@ -327,7 +372,7 @@ namespace tenetApi.Controllers
 
         [HttpGet]
         [Route("shopInvoiceChartData")]
-        public async Task<ActionResult<InvoiceChartViewModel>> ShopReportChartData([FromBody]InvoiceChartViewModel chartData)
+        public async Task<ActionResult<InvoiceChartViewModel>> ShopReportChartData([FromBody] InvoiceChartViewModel chartData)
         {
             return Ok();
         }
