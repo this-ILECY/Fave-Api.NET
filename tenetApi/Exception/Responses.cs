@@ -8,38 +8,56 @@
         }
         public static string OkResponse(string controllerName, string reason)
         {
+            string returner = "";
+
+            switch (controllerName)
+            {
+                case "token":
+                    {
+                        returner = controllerName + " "  + reason;
+                        goto returns;
+                    }
+            }
             switch (reason)
             {
                 case "add":
                     {
-                        return controllerName + " Added successfully!";
+                        returner =  controllerName + " Added successfully!";
+                        break;
                     }
                 case "del":
                     {
-                        return controllerName + " deleted successfully!";
+                        returner = controllerName + " deleted successfully!";
+                        break;
                     }
                 case "undel":
                     {
-                        return controllerName + " undeleted successfully!";
+                        returner = controllerName + " undeleted successfully!";
+                        break;
                     }
                 case "act":
                     {
-                        return controllerName + " activated successfully!";
+                        returner = controllerName + " activated successfully!";
+                        break;
                     }
                 case "inact":
                     {
-                        return controllerName + " inactivated successfully!";
+                        returner = controllerName + " inactivated successfully!";
+                        break;
                     }
                 case "mod":
                     {
-                        return controllerName + " updated successfully!";
+                        returner = controllerName + " updated successfully!";
+                        break;
                     }
                 default:
                     {
-                        return controllerName + " OK!";
+                        returner = controllerName + " OK!";
+                        break;
                     }
             }
-
+            returns:
+            return returner;
         }
         public static string BadResponse(string controllerName, string reason)
         {
@@ -67,9 +85,35 @@
                     }
                 default:
                     {
-                        return  $"{controllerName} BadRequest!";
+                        return $"{controllerName} BadRequest!";
                     }
             }
+        }
+
+        public static string Unathorized(string reason, string detail)
+        {
+            string Returner = "";
+            switch (reason)
+            {
+                case "token":
+                    Returner = "token";
+                    break;
+                default:
+                    break;
+            }
+            switch (detail)
+            {
+                case "expired":
+                    Returner = Returner + " expired!";
+                    break;
+                case "bad":
+                    Returner = Returner + " bad detail!";
+                    break;
+                default:
+                    break;
+            }
+
+            return Returner;
         }
     }
 }

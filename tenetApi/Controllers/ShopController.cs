@@ -185,7 +185,6 @@ namespace tenetApi.Controllers
 
             Shop theShop = new Shop()
             {
-                ShopID = shop.ShopID,
                 ShopName = shop.ShopName,
                 IsActive = shop.IsActive,
                 CreatedDate = DateTime.Now,

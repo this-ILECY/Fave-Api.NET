@@ -160,18 +160,18 @@ namespace tenetApi.Controllers
                 var authSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JWT:Key"]));
                 var token = new JwtSecurityToken(
                 issuer: _configuration["JWT:Issuer"],
+                expires: DateTime.UtcNow.AddMinutes(30),
                 audience: _configuration["JWT:Audience"],
-                expires: DateTime.Now.AddMinutes(10),
                 claims: authClaims,
+
 
                 signingCredentials: new SigningCredentials(authSigningKey, SecurityAlgorithms.HmacSha256)
                 );
 
                 ShopViewModel shopmodel = new ShopViewModel()
                 {
-                    ShopID = _context.shops.Max(c => c.ShopID),
                     UserID = user.Id,
-                    ShopCategoryID = 1,
+                    ShopCategoryID = 2,
                     ShopName = "",
                     ShopAddress = "",
                     TelePhone = "",
@@ -195,5 +195,75 @@ namespace tenetApi.Controllers
             }
             return Unauthorized();
         }
+
+
+        [HttpPost]
+        [Route("refreshToken")]
+
+        public async Task<IActionResult> RefreshToken([FromHeader] string token)
+        {
+            if (token == null || token == "")
+                return Unauthorized(Responses.Unathorized("token", "bad"));
+
+            JwtSecurityTokenHandler jwtSecurityTokenHandler = new JwtSecurityTokenHandler();
+
+            var validateToken = jwtSecurityTokenHandler.CanReadToken(token);
+            if (!validateToken)
+                return Unauthorized(Responses.Unathorized("token","bad"));
+
+            var jsonToken = jwtSecurityTokenHandler.ReadToken(token.ToString());
+            var tokenS = jsonToken as JwtSecurityToken;
+
+            var name = tokenS.Claims.First(claim => claim.Type == "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name").Value;
+            var role = tokenS.Claims.First(claim => claim.Type == "http://schemas.microsoft.com/ws/2008/06/identity/claims/role").Value;
+
+            var tokenTime = tokenS.ValidTo;
+            var date = new DateTime();
+            date = DateTime.Now;
+            tokenTime = tokenTime.ToLocalTime();
+
+            if (date > tokenTime)
+            {
+                return Unauthorized(Responses.Unathorized("token", "expired"));
+            }
+            else
+            {
+                var userExists = userManager.FindByNameAsync(name).Result;
+                var roleExists = roleManager.FindByNameAsync(role).Result;
+
+                if (userExists != null && roleExists != null)
+                {
+                    var userRoles = await userManager.GetRolesAsync(userExists);
+                    var authClaims = new List<Claim>{
+                        new Claim(ClaimTypes.Name, userExists.UserName),
+                        new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+                        };
+                    foreach (var userRole in userRoles)
+                    {
+                        authClaims.Add(new Claim(ClaimTypes.Role, userRole));
+                    }
+                    var authSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JWT:Key"]));
+                    var newToken = new JwtSecurityToken(
+                    issuer: _configuration["JWT:Issuer"],
+                    expires: DateTime.UtcNow.AddMinutes(30),
+                    audience: _configuration["JWT:Audience"],
+                    claims: authClaims,
+
+
+                    signingCredentials: new SigningCredentials(authSigningKey, SecurityAlgorithms.HmacSha256)
+                    );
+
+                    return Ok(new
+                    {
+                        token = new JwtSecurityTokenHandler().WriteToken(newToken),
+                        expiration = newToken.ValidTo,
+                        user = userExists.UserName
+                    });
+                }
+
+                return Unauthorized(Responses.Unathorized("token", "bad"));
+            }
+        }
+
     }
 }
