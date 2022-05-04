@@ -14,7 +14,7 @@
             {
                 case "token":
                     {
-                        returner = controllerName + " "  + reason;
+                        returner = controllerName + " " + reason;
                         goto returns;
                     }
             }
@@ -22,7 +22,7 @@
             {
                 case "add":
                     {
-                        returner =  controllerName + " Added successfully!";
+                        returner = controllerName + " Added successfully!";
                         break;
                     }
                 case "del":
@@ -56,7 +56,7 @@
                         break;
                     }
             }
-            returns:
+        returns:
             return returner;
         }
         public static string BadResponse(string controllerName, string reason)

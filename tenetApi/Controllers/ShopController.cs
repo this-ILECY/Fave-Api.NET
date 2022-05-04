@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -20,6 +22,9 @@ namespace tenetApi.Controllers
     public class ShopController : ControllerBase
     {
         private readonly AppDbContext _context;
+        private readonly UserManager<User> userManager;
+        private readonly RoleManager<Role> roleManager;
+        private readonly IConfiguration _configuration;
 
         public ShopController(AppDbContext context)
         {
@@ -95,13 +100,18 @@ namespace tenetApi.Controllers
         }
 
         [HttpGet]
-        [Route("ShopByUserID")]
-        public async Task<ActionResult<ShopViewModel>> GetShopByUserID(string userID)
+        [Route("ShopByUserName")]
+        public async Task<ActionResult<ShopViewModel>> GetShopByUserName([FromHeader]string userName)
         {
             ShopViewModel _shopViewModelByName;
 
-            if (userID == null)
+            if (userName == null || userName == "")
                 return NotFound(Responses.NotFound("Shop"));
+
+            var userExists = _context.Users.FirstOrDefault(c => c.UserName == userName);
+
+            if (userExists == null)
+                return NotFound(Responses.NotFound("shop"));
 
             _shopViewModelByName = _context.shops.Select(c => new ShopViewModel()
             {
@@ -118,7 +128,7 @@ namespace tenetApi.Controllers
                 IsDeleted = c.IsDeleted,
                 CreatedDate = c.CreatedDate
 
-            }).ToList().FirstOrDefault(c => c.UserID.ToString() == userID);
+            }).ToList().FirstOrDefault(c => c.UserID.ToString() == userExists.Id.ToString());
 
             if (_shopViewModelByName == null)
             {
@@ -178,7 +188,7 @@ namespace tenetApi.Controllers
             {
                 return BadRequest(Responses.BadResponse("User", "invalid"));
             }
-            if (!_context.shops.Any(c => c.ShopCategoryID == shop.ShopCategoryID))
+            if (!_context.shopCategories.Any(c => c.ShopCategoryID == shop.ShopCategoryID))
             {
                 return BadRequest(Responses.BadResponse("Shop Category", "invalid"));
             }
@@ -230,7 +240,7 @@ namespace tenetApi.Controllers
             {
                 return BadRequest(Responses.BadResponse("User", "invalid"));
             }
-            if (!_context.shops.Any(c => c.ShopCategoryID == shop.ShopCategoryID))
+            if (!_context.shopCategories.Any(c => c.ShopCategoryID == shop.ShopCategoryID))
             {
                 return BadRequest(Responses.BadResponse("Shop category", "invalid"));
             }

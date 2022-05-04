@@ -52,7 +52,7 @@ namespace tenetApi.Controllers
             if (UserExists != null)
                 return BadRequest(Responses.BadResponse("user", "duplicate"));
             else
-                return Ok();
+                return Ok("found!");
         }
 
         [HttpPost]
@@ -70,12 +70,15 @@ namespace tenetApi.Controllers
             var userNameExists = await userManager.FindByNameAsync(login.UserName);
             var userEmailExists = await userManager.FindByNameAsync(login.Email);
             var userPhoneExists = await userManager.FindByNameAsync(login.Phone);
+            var roleExists = await roleManager.FindByNameAsync(login.Role);
             if (userNameExists != null)
                 return BadRequest(Responses.BadResponse("user", "duplicate"));
             if (userEmailExists != null)
                 return BadRequest(Responses.BadResponse("email", "duplicate"));
             if (userPhoneExists != null)
                 return BadRequest(Responses.BadResponse("phone", "duplicate"));
+            if (roleExists == null)
+                return BadRequest(Responses.BadResponse("role", "invalid"));
 
 
             User user = new User()
@@ -92,6 +95,25 @@ namespace tenetApi.Controllers
                 var role = await userManager.AddToRoleAsync(user, login.Role);
                 if (!role.Succeeded == true)
                     return BadRequest(Responses.BadResponse("user", "invalid") + " " + result);
+
+                ShopViewModel shopmodel = new ShopViewModel()
+                {
+                    UserID = user.Id,
+                    ShopCategoryID = 2,
+                    ShopName = user.UserName,
+                    ShopAddress = "",
+                    TelePhone = "",
+                    CellPhone = "",
+                    ShopAvatar = "",
+                    ShopBanner = "",
+                    ShopLatitude = 0,
+                    ShopLongitude = 0,
+                    IsActive = true
+                };
+
+                ShopController shop = new ShopController(_context);
+                await shop.AddShop(shopmodel);
+
                 var loginContent = await Login(login);
 
                 return Ok(loginContent);
@@ -168,23 +190,6 @@ namespace tenetApi.Controllers
                 signingCredentials: new SigningCredentials(authSigningKey, SecurityAlgorithms.HmacSha256)
                 );
 
-                ShopViewModel shopmodel = new ShopViewModel()
-                {
-                    UserID = user.Id,
-                    ShopCategoryID = 2,
-                    ShopName = "",
-                    ShopAddress = "",
-                    TelePhone = "",
-                    CellPhone = "",
-                    ShopAvatar = "",
-                    ShopBanner = "",
-                    ShopLatitude = 0,
-                    ShopLongitude = 0,
-                    IsActive = true
-                };
-
-                ShopController shop = new ShopController(_context);
-                await shop.AddShop(shopmodel);
 
                 return Ok(new
                 {
@@ -209,7 +214,7 @@ namespace tenetApi.Controllers
 
             var validateToken = jwtSecurityTokenHandler.CanReadToken(token);
             if (!validateToken)
-                return Unauthorized(Responses.Unathorized("token","bad"));
+                return Unauthorized(Responses.Unathorized("token", "bad"));
 
             var jsonToken = jwtSecurityTokenHandler.ReadToken(token.ToString());
             var tokenS = jsonToken as JwtSecurityToken;
