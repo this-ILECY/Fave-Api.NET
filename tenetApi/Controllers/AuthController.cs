@@ -122,12 +122,6 @@ namespace tenetApi.Controllers
             else
                 return BadRequest(Responses.BadResponse("user", "invalid") + " " + result);
 
-
-
-
-
-
-
         }
 
 
