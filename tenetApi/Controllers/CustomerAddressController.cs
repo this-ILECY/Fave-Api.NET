@@ -67,7 +67,7 @@ namespace tenetApi.Controllers
             theCustomerAddress.CustomerLatitude = customerAddress.CustomerLatitude;
             theCustomerAddress.CustomerLongitude = customerAddress.CustomerLongitude;
             theCustomerAddress.IsDeleted = customerAddress.IsDeleted;
-            theCustomerAddress.CreatedDate = DateTime.Now;
+            theCustomerAddress.CreatedDate = (DateTime.Now).ToString();
 
             _context.customerAddresses.Add(theCustomerAddress);
             await _context.SaveChangesAsync();

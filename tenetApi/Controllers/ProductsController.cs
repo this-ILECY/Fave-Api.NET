@@ -102,7 +102,7 @@ namespace tenetApi.Controllers
             theProduct.ProductCode = product.ProductCode;
             theProduct.productCategoryFk = catId;
             theProduct.shopFk = shopId;
-            theProduct.CreatedDate = DateTime.Now;
+            theProduct.CreatedDate = (DateTime.Now).ToString();
 
 
             _context.products.Add(theProduct);

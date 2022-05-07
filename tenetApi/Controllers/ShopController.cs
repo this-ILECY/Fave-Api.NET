@@ -197,7 +197,7 @@ namespace tenetApi.Controllers
             {
                 ShopName = shop.ShopName,
                 IsActive = shop.IsActive,
-                CreatedDate = DateTime.Now,
+                CreatedDate = (DateTime.Now).ToString(),
                 ShopCategoryID = shop.ShopCategoryID,
                 CellPhone = shop.CellPhone,
                 IsDeleted = shop.IsDeleted,

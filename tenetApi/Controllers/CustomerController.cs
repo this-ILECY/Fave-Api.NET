@@ -169,7 +169,7 @@ namespace tenetApi.Controllers
             theCustomer.Email = customer.Email;
             theCustomer.Telephone = customer.Telephone;
             theCustomer.UserID = customer.UserID;
-            theCustomer.CreatedDate = DateTime.Now;
+            theCustomer.CreatedDate = (DateTime.Now).ToString();
 
             _context.customers.Add(theCustomer);
             await _context.SaveChangesAsync();

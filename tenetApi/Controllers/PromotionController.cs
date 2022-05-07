@@ -23,7 +23,7 @@ namespace tenetApi.Controllers
         }
 
 
-        
+
         //promotions all
         //[HttpGet]
         //[Route("PromotionAll")]
@@ -149,8 +149,25 @@ namespace tenetApi.Controllers
             {
                 return BadRequest(Responses.BadResponse("shop", "invalid"));
             }
+            var ProductCategoryID = 1;
+            ProductViewModel theProduct = new ProductViewModel()
+            {
+                CreatedDate = (DateTime.Now).ToString(),
+                description = promotion.productDescription,
+                IsDeleted = promotion.IsDeleted,
+                ProductCode = promotion.PromotionID,
+                ProductTitle = promotion.ProductTitle,
+                ShopID = promotion.ShopID,
+                ProductCategoryID = ProductCategoryID,
+                ProductID = promotion.ProductID,
+            };
+
+            ProductsController productsController = new ProductsController(_context);
+            await productsController.AddProduct(theProduct);
+
+            var a = _context.products.FirstOrDefault(c => c.ProductID == promotion.ProductID);
             Promotion thePromotion = new Promotion();
-            thePromotion.ProductID = promotion.ProductID;
+            thePromotion.ProductID = ProductCategoryID;
             thePromotion.ShopID = promotion.ShopID;
             thePromotion.BasePrice = promotion.BasePrice;
             thePromotion.DiscountPrice = promotion.DiscountPrice;
@@ -160,7 +177,7 @@ namespace tenetApi.Controllers
             thePromotion.EndDate = promotion.EndDate;
             thePromotion.IsActive = promotion.IsActive;
             thePromotion.IsDeleted = promotion.IsDeleted;
-            thePromotion.CreatedDate = DateTime.Now;
+            thePromotion.CreatedDate = (DateTime.Now).ToString();
             thePromotion.productFk = _context.products.FirstOrDefault(c => c.ProductID == promotion.ProductID);
             thePromotion.shopFk = _context.shops.FirstOrDefault(c => c.ShopID == promotion.ShopID);
 
